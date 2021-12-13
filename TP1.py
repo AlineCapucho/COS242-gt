@@ -29,8 +29,14 @@ class Graph:
                 self.matrix.append(row)
 
             for u, v in e:
+                print(u, v)
+                print(self.matrix[u-1][v-1])
                 self.matrix[u-1][v-1] = 1
+                print(self.matrix[v-1][u-1])
                 self.matrix[v-1][u-1] = 1
+            
+            for elem in self.matrix:
+                print(elem)
         else:
             raise Exception('Unvalid kind.')
     
@@ -69,8 +75,9 @@ class Graph:
             for i, u in enumerate(self.matrix):
                 edges += "edges of vertice {}: ".format(str(i+1))
 
-                for v in u:
-                    edges += "{}, ".format(str(v+1))
+                for j, v in enumerate(u):
+                    if v:
+                        edges += "{}, ".format(str(j+1))
                 edges += "\n"
 
             return vertices + '\n' + edges
