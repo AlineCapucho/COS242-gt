@@ -40,20 +40,40 @@ class Graph:
         else:
             raise Exception('Unvalid kind.')
     
-    def create_from_file(self, filename):
+    def create_from_file(self, filename, kind='list'):
         # This function must create a graph by reading a file
         with open(filename, 'r') as f:
             ver = int(f.readline())
-            for i in range(1, ver+1):
-                self.vertices.append(Vertice(i))
-            
-            for line in f.readlines():
-                edge = [int(v) for v in line if v not in [' ', '\n']]
-                self.vertices[edge[0]-1].vizinhos.append(edge[1])
-                self.vertices[edge[0]-1].grau += 1
+            if kind == 'list':
+                self.kind = 'list'
+                for i in range(1, ver+1):
+                    self.vertices.append(Vertice(i))
+                
+                for line in f.readlines():
+                    edge = [int(v) for v in line if v not in [' ', '\n']]
+                    self.vertices[edge[0]-1].vizinhos.append(edge[1])
+                    self.vertices[edge[0]-1].grau += 1
 
-                self.vertices[edge[1]-1].vizinhos.append(edge[0])
-                self.vertices[edge[1]-1].grau += 1
+                    self.vertices[edge[1]-1].vizinhos.append(edge[0])
+                    self.vertices[edge[1]-1].grau += 1
+            elif kind == 'matrix':
+                self.kind = 'matrix'
+                for i in range(ver):
+                    self.matrix.append(deque(0 for j in range(ver)))
+                
+                for line in f.readlines():
+                    u = int(line[0])
+                    v = int(line[2])
+                    print(u, v)
+                    print(self.matrix[u-1][v-1])
+                    self.matrix[u-1][v-1] = 1
+                    print(self.matrix[v-1][u-1])
+                    self.matrix[v-1][u-1] = 1
+                
+                for elem in self.matrix:
+                    print(elem)
+            else:
+                raise Exception('Unvalid kind.')
     
     def __repr__(self):
         # Creates a print representation to visualize the contents
@@ -95,16 +115,16 @@ class Vertice:
 #### Testing ####
 
 """ Testing the create function """
-vertices = [1, 2, 3, 4, 5]
-edges = [(1, 2), (1, 3), (2, 5), (2, 4)]
+# vertices = [1, 2, 3, 4, 5]
+# edges = [(1, 2), (1, 3), (2, 5), (2, 4)]
 
-mygraph = Graph()
-mygraph.create(5, edges, kind='matrix')
-print(mygraph)
+# mygraph = Graph()
+# mygraph.create(5, edges, kind='matrix')
+# print(mygraph)
 
 """ Testing the create_from_file function """
 # mygraph = Graph()
-# mygraph.create_from_file('test.txt')
+# mygraph.create_from_file('test.txt', kind='matrix')
 # print(mygraph)
 
 #### TAIL ####
