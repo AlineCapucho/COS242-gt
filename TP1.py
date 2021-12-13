@@ -78,6 +78,7 @@ class Graph:
                 for j, v in enumerate(u):
                     if v:
                         edges += "{}, ".format(str(j+1))
+                edges = edges.rstrip(', ')
                 edges += "\n"
 
             return vertices + '\n' + edges
