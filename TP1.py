@@ -24,9 +24,9 @@ class Graph:
                 self.vertices[v-1].grau += 1
         elif kind == 'matrix':
             self.kind = 'matrix'
-            row = deque(0 for i in range(v))
+
             for i in range(v):
-                self.matrix.append(row)
+                self.matrix.append(deque(0 for j in range(v)))
 
             for u, v in e:
                 print(u, v)
