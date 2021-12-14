@@ -1,4 +1,6 @@
 from collections import deque
+from queue import Queue, LifoQueue
+import copy
 
 #### Actual Code ####
 
@@ -38,7 +40,7 @@ class Graph:
                 self.matrix[v-1][u-1] = 1
                 self.graus[v-1] += 1
         else:
-            raise Exception('Unvalid kind.')
+            raise Exception('Invalid kind.')
     
     def create_from_file(self, filename, kind='list'):
         # This function must create a graph by reading a file
@@ -107,6 +109,56 @@ class Graph:
         else:
             raise Exception('This graph was not initialized')
 
+    def search(self, b):
+        self.__bfs__(b)
+        self.__dfs__(b)
+
+
+    def __bfs__(self, b):
+        if self.kind == 'list':
+            # BFS search
+            self.bfsMarks = []
+            self.bfsExplored = []
+            self.bfsQueue = Queue()
+
+            for i in range(len(self.vertices)):
+                self.bfsMarks.append(0)
+            self.bfsMarks[b-1] = 1
+            self.bfsQueue.put(b)
+
+            while(self.bfsQueue.empty() != True):
+                v = self.bfsQueue.get()
+                vizinhos = self.vertices[v-1].vizinhos
+                for i in range (len(vizinhos)):
+                    if self.bfsMarks[vizinhos[i]-1] == 0:
+                        self.bfsMarks[vizinhos[i]-1] = 1
+                        self.bfsQueue.put(vizinhos[i])
+                self.bfsExplored.append(v)
+
+            print(self.bfsExplored)
+
+    def __dfs__(self, b):
+        if self.kind == 'list':
+            self.dfsMarks = []
+            self.dfsExplored = []
+            self.dfsStack = LifoQueue()
+
+            for i in range(len(self.vertices)):
+                self.dfsMarks.append(0)
+        
+            self.dfsStack.put(b)
+
+            while(self.dfsStack.empty() != True):
+                v = self.dfsStack.get()
+                vizinhos = self.vertices[v-1].vizinhos
+                if(self.dfsMarks[v-1] == 0):
+                    self.dfsMarks[v-1] = 1
+                    self.dfsExplored.append(v)
+                    for i in range (len(vizinhos)-1, -1, -1):
+                        self.dfsStack.put(vizinhos[i])
+
+            print(self.dfsExplored)
+        
 class Vertice:
     def __init__(self, id):
         self.id = id
@@ -116,16 +168,18 @@ class Vertice:
 #### Testing ####
 
 """ Testing the create function """
-# vertices = [1, 2, 3, 4, 5]
-# edges = [(1, 2), (1, 3), (2, 5), (2, 4)]
+vertices = [1, 2, 3, 4, 5, 6, 7, 8]
+edges = [(1, 3), (1, 4), (2, 3), (2, 4), (3, 4), (3, 8), (4, 6), (4, 7), (5, 6), (5, 7), (6, 7)]
 
-# mygraph = Graph()
-# mygraph.create(5, edges, kind='list')
+mygraph = Graph()
+mygraph.create(8, edges, kind='list')
 # print(mygraph)
 
+mygraph.search(1)
+
 """ Testing the create_from_file function """
-mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='list')
-print(mygraph)
+# mygraph = Graph()
+# mygraph.create_from_file('test.txt', kind='list')
+# print(mygraph)
 
 #### TAIL ####
