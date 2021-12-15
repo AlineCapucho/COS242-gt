@@ -117,31 +117,47 @@ class Graph:
         if self.kind == 'list':
             self.bfsMarks = []
             self.bfsExplored = []
+            self.bfsPai = []
+            self.bfsNivel = []
             self.bfsQueue = Queue()
 
             for i in range(len(self.vertices)):
                 self.bfsMarks.append(0)
+                self.bfsPai.append(0)
+                self.bfsNivel.append(0)
             self.bfsMarks[b-1] = 1
             self.bfsQueue.put(b)
 
             while(self.bfsQueue.empty() != True):
                 v = self.bfsQueue.get()
                 vizinhos = self.vertices[v-1].vizinhos
+
                 for i in range (len(vizinhos)):
                     if self.bfsMarks[vizinhos[i]-1] == 0:
                         self.bfsMarks[vizinhos[i]-1] = 1
                         self.bfsQueue.put(vizinhos[i])
+                        self.bfsPai[vizinhos[i]-1] = v
+                        self.bfsNivel[vizinhos[i] - 1] = self.bfsNivel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
                 self.bfsExplored.append(v)
 
-            print(self.bfsExplored)
+            # ordem dos vertices explorados
+            # vetor dos vertices pais: self.bfsPai[0] = 2 quer dizer que o vertice 2 eh o pai do vertice 1
+            # vetor do nivel dos vertices na arvore geradora, [0] corresponde ao vertice 1, etc. o nivel da origem eh 0
+            # print(self.bfsExplored) 
+            # print(self.bfsPai)
+            # print(self.bfsNivel)
 
         elif self.kind == 'matrix':
             self.bfsMarks = []
             self.bfsExplored = []
+            self.bfsPai = []
+            self.bfsNivel = []
             self.bfsQueue = Queue()
 
             for i in range(len(self.matrix[0])):
                 self.bfsMarks.append(0)
+                self.bfsPai.append(0)
+                self.bfsNivel.append(0)
             self.bfsMarks[b-1] = 1
             self.bfsQueue.put(b)
 
@@ -152,9 +168,13 @@ class Graph:
                         if self.bfsMarks[i] == 0:
                             self.bfsMarks[i] = 1
                             self.bfsQueue.put(i+1)
+                            self.bfsPai[i] = v
+                            self.bfsNivel[i] = self.bfsNivel[self.bfsPai[i] - 1] + 1
                 self.bfsExplored.append(v)
             
-            print(self.bfsExplored)
+            # print(self.bfsExplored)
+            # print(self.bfsPai)
+            # print(self.bfsNivel)
 
         else:
             raise Exception('Invalid kind.')
@@ -163,10 +183,14 @@ class Graph:
         if self.kind == 'list':
             self.dfsMarks = []
             self.dfsExplored = []
+            self.dfsPai = []
+            self.dfsNivel = []
             self.dfsStack = LifoQueue()
 
             for i in range(len(self.vertices)):
                 self.dfsMarks.append(0)
+                self.dfsPai.append(0)
+                self.dfsNivel.append(0)
         
             self.dfsStack.put(b)
 
@@ -178,16 +202,25 @@ class Graph:
                     self.dfsExplored.append(v)
                     for i in range (len(vizinhos)-1, -1, -1):
                         self.dfsStack.put(vizinhos[i])
+                        if(self.dfsMarks[vizinhos[i]-1] == 0):
+                            self.dfsPai[vizinhos[i]-1] = v
+                            self.dfsNivel[vizinhos[i] - 1] = self.dfsNivel[self.dfsPai[vizinhos[i] - 1] - 1] + 1
 
-            print(self.dfsExplored)
+            # print(self.dfsExplored)
+            # print(self.dfsPai)
+            # print(self.dfsNivel)
 
         elif self.kind == 'matrix':
             self.dfsMarks = []
             self.dfsExplored = []
+            self.dfsPai = []
+            self.dfsNivel = []
             self.dfsStack = LifoQueue()
 
             for i in range(len(self.matrix[0])):
                 self.dfsMarks.append(0)
+                self.dfsPai.append(0)
+                self.dfsNivel.append(0)
 
             self.dfsStack.put(b)
 
@@ -199,8 +232,13 @@ class Graph:
                     for i in range(len(self.matrix[0])-1, -1, -1):
                         if self.matrix[v-1][i] == 1:
                             self.dfsStack.put(i+1)
+                            if(self.dfsMarks[i] == 0):
+                                self.dfsPai[i] = v
+                                self.dfsNivel[i] = self.dfsNivel[self.dfsPai[i] - 1] + 1
 
-            print(self.dfsExplored)
+            # print(self.dfsExplored)
+            # print(self.dfsPai)
+            # print(self.dfsNivel)
 
         else:
             raise Exception('Invalid kind.')
@@ -224,15 +262,15 @@ class Vertice:
 # mygraph.search(1)
 
 """ Testing the create_from_file function """
-mygraphlist = Graph()
-mygraphlist.create_from_file('test.txt', kind='list')
+mygraph = Graph()
+mygraph.create_from_file('test2.txt', kind='list')
 # print(mygraph)
+mygraph.search(1)
 
-mygraphlist.search(1)
+mygraph2 = Graph()
+mygraph2.create_from_file('test2.txt', kind='matrix')
+# print(mygraph)
+mygraph2.search(1)
 
-mygraphmatrix = Graph()
-mygraphmatrix.create_from_file('test.txt', kind='matrix')
-
-mygraphmatrix.search(1)
 
 #### TAIL ####
