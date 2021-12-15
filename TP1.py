@@ -110,11 +110,7 @@ class Graph:
         else:
             raise Exception('This graph was not initialized')
 
-    def search(self, b):
-        self.__bfs__(b)
-        self.__dfs__(b)
-
-    def __bfs__(self, b):
+    def bfs(self, b):
         if self.kind == 'list':
             self.bfsMarks = []
             self.bfsExplored = []
@@ -173,7 +169,7 @@ class Graph:
         else:
             raise Exception('Invalid kind.')
 
-    def __dfs__(self, b):
+    def dfs(self, b):
         if self.kind == 'list':
             self.dfsMarks = []
             self.dfsExplored = []
@@ -271,6 +267,5 @@ class Vertice:
 mygraph = Graph()
 mygraph.create_from_file('test.txt', kind='list')
 print(mygraph)
-
 
 #### TAIL ####
