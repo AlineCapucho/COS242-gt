@@ -1,5 +1,4 @@
 from collections import deque
-from queue import Queue, LifoQueue
 import math
 import copy
 
@@ -113,56 +112,52 @@ class Graph:
     def bfs(self, b):
         if self.kind == 'list':
             self.bfsMarks = []
-            self.bfsExplored = []
             self.bfsPai = []
             self.bfsNivel = []
-            self.bfsQueue = Queue()
+            self.bfsQueue = deque()
 
             for i in range(len(self.vertices)):
                 self.bfsMarks.append(0)
                 self.bfsPai.append(0)
                 self.bfsNivel.append(0)
             self.bfsMarks[b-1] = 1
-            self.bfsQueue.put(b)
+            self.bfsQueue.append(b)
 
-            while(self.bfsQueue.empty() != True):
-                v = self.bfsQueue.get()
+            while(self.bfsQueue):
+                v = self.bfsQueue.pop()
                 vizinhos = self.vertices[v-1].vizinhos
 
                 for i in range (len(vizinhos)):
                     if self.bfsMarks[vizinhos[i]-1] == 0:
                         self.bfsMarks[vizinhos[i]-1] = 1
-                        self.bfsQueue.put(vizinhos[i])
+                        self.bfsQueue.append(vizinhos[i])
                         self.bfsPai[vizinhos[i]-1] = v
                         self.bfsNivel[vizinhos[i] - 1] = self.bfsNivel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
-                self.bfsExplored.append(v)
 
             return [self.bfsPai, self.bfsNivel]
 
         elif self.kind == 'matrix':
             self.bfsMarks = []
-            self.bfsExplored = []
             self.bfsPai = []
             self.bfsNivel = []
-            self.bfsQueue = Queue()
+            self.bfsQueue = deque()
 
             for i in range(len(self.matrix[0])):
                 self.bfsMarks.append(0)
                 self.bfsPai.append(0)
                 self.bfsNivel.append(0)
             self.bfsMarks[b-1] = 1
-            self.bfsQueue.put(b)
+            self.bfsQueue.append(b)
 
-            while(self.bfsQueue.empty() != True):
-                v = self.bfsQueue.get()
+            while(self.bfsQueue):
+                v = self.bfsQueue.pop()
                 for i in range(len(self.matrix[0])):
                     if self.matrix[v-1][i] == 1:
                         if self.bfsMarks[i] == 0:
                             self.bfsMarks[i] = 1
-                            self.bfsQueue.put(i+1)
+                            self.bfsQueue.append(i+1)
                             self.bfsPai[i] = v
                             self.bfsNivel[i] = self.bfsNivel[self.bfsPai[i] - 1] + 1
-                self.bfsExplored.append(v)
             
             return [self.bfsPai, self.bfsNivel]
 
@@ -172,26 +167,24 @@ class Graph:
     def dfs(self, b):
         if self.kind == 'list':
             self.dfsMarks = []
-            self.dfsExplored = []
             self.dfsPai = []
             self.dfsNivel = []
-            self.dfsStack = LifoQueue()
+            self.dfsStack = deque()
 
             for i in range(len(self.vertices)):
                 self.dfsMarks.append(0)
                 self.dfsPai.append(0)
                 self.dfsNivel.append(0)
         
-            self.dfsStack.put(b)
+            self.dfsStack.appendleft(b)
 
-            while(self.dfsStack.empty() != True):
-                v = self.dfsStack.get()
+            while(self.dfsStack):
+                v = self.dfsStack.popleft()
                 vizinhos = self.vertices[v-1].vizinhos
                 if(self.dfsMarks[v-1] == 0):
                     self.dfsMarks[v-1] = 1
-                    self.dfsExplored.append(v)
                     for i in range (len(vizinhos)-1, -1, -1):
-                        self.dfsStack.put(vizinhos[i])
+                        self.dfsStack.appendleft(vizinhos[i])
                         if(self.dfsMarks[vizinhos[i]-1] == 0):
                             self.dfsPai[vizinhos[i]-1] = v
                             self.dfsNivel[vizinhos[i] - 1] = self.dfsNivel[self.dfsPai[vizinhos[i] - 1] - 1] + 1
@@ -200,26 +193,24 @@ class Graph:
 
         elif self.kind == 'matrix':
             self.dfsMarks = []
-            self.dfsExplored = []
             self.dfsPai = []
             self.dfsNivel = []
-            self.dfsStack = LifoQueue()
+            self.dfsStack = deque()
 
             for i in range(len(self.matrix[0])):
                 self.dfsMarks.append(0)
                 self.dfsPai.append(0)
                 self.dfsNivel.append(0)
 
-            self.dfsStack.put(b)
+            self.dfsStack.appendleft(b)
 
-            while(self.dfsStack.empty() != True):
-                v = self.dfsStack.get()
+            while(self.dfsStack):
+                v = self.dfsStack.popleft()
                 if(self.dfsMarks[v-1] == 0):
                     self.dfsMarks[v-1] = 1
-                    self.dfsExplored.append(v)
                     for i in range(len(self.matrix[0])-1, -1, -1):
                         if self.matrix[v-1][i] == 1:
-                            self.dfsStack.put(i+1)
+                            self.dfsStack.appendleft(i+1)
                             if(self.dfsMarks[i] == 0):
                                 self.dfsPai[i] = v
                                 self.dfsNivel[i] = self.dfsNivel[self.dfsPai[i] - 1] + 1
@@ -230,7 +221,7 @@ class Graph:
             raise Exception('Invalid kind.')
 
     def distancia(self, v1, v2):
-        bfsResult = self.__bfs__(v1)
+        bfsResult = self.bfs(v1)
         nivel = bfsResult[1]
 
         if (nivel[v2 - 1] == 0):
@@ -239,9 +230,9 @@ class Graph:
             return nivel[v2 - 1]
 
     def diametro(self):
-        bfsResult = self.__bfs__(1)
+        bfsResult = self.bfs(1)
         nivel = bfsResult[1]
-        bfsResult = self.__bfs__(nivel.index(max(nivel))+1)
+        bfsResult = self.bfs(nivel.index(max(nivel))+1)
         nivel = bfsResult[1]
         return max(nivel)
 
@@ -265,7 +256,9 @@ class Vertice:
 
 """ Testing the create_from_file function """
 mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='list')
+mygraph.create_from_file('test2.txt', kind='matrix')
 print(mygraph)
+
+print(mygraph.bfs(1))
 
 #### TAIL ####
