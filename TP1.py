@@ -77,7 +77,7 @@ class Graph:
                     self.matrix[v-1][u-1] = 1
                     self.graus[v-1] += 1
             else:
-                raise Exception('Unvalid kind.')
+                raise Exception('Invalid kind.')
     
     def __repr__(self):
         # Creates a print representation to visualize the contents
@@ -113,10 +113,8 @@ class Graph:
         self.__bfs__(b)
         self.__dfs__(b)
 
-
     def __bfs__(self, b):
         if self.kind == 'list':
-            # BFS search
             self.bfsMarks = []
             self.bfsExplored = []
             self.bfsQueue = Queue()
@@ -136,6 +134,30 @@ class Graph:
                 self.bfsExplored.append(v)
 
             print(self.bfsExplored)
+
+        elif self.kind == 'matrix':
+            self.bfsMarks = []
+            self.bfsExplored = []
+            self.bfsQueue = Queue()
+
+            for i in range(len(self.matrix[0])):
+                self.bfsMarks.append(0)
+            self.bfsMarks[b-1] = 1
+            self.bfsQueue.put(b)
+
+            while(self.bfsQueue.empty() != True):
+                v = self.bfsQueue.get()
+                for i in range(len(self.matrix[0])):
+                    if self.matrix[v-1][i] == 1:
+                        if self.bfsMarks[i] == 0:
+                            self.bfsMarks[i] = 1
+                            self.bfsQueue.put(i+1)
+                self.bfsExplored.append(v)
+            
+            print(self.bfsExplored)
+
+        else:
+            raise Exception('Invalid kind.')
 
     def __dfs__(self, b):
         if self.kind == 'list':
@@ -158,7 +180,31 @@ class Graph:
                         self.dfsStack.put(vizinhos[i])
 
             print(self.dfsExplored)
-        
+
+        elif self.kind == 'matrix':
+            self.dfsMarks = []
+            self.dfsExplored = []
+            self.dfsStack = LifoQueue()
+
+            for i in range(len(self.matrix[0])):
+                self.dfsMarks.append(0)
+
+            self.dfsStack.put(b)
+
+            while(self.dfsStack.empty() != True):
+                v = self.dfsStack.get()
+                if(self.dfsMarks[v-1] == 0):
+                    self.dfsMarks[v-1] = 1
+                    self.dfsExplored.append(v)
+                    for i in range(len(self.matrix[0])-1, -1, -1):
+                        if self.matrix[v-1][i] == 1:
+                            self.dfsStack.put(i+1)
+
+            print(self.dfsExplored)
+
+        else:
+            raise Exception('Invalid kind.')
+
 class Vertice:
     def __init__(self, id):
         self.id = id
@@ -168,18 +214,25 @@ class Vertice:
 #### Testing ####
 
 """ Testing the create function """
-vertices = [1, 2, 3, 4, 5, 6, 7, 8]
-edges = [(1, 3), (1, 4), (2, 3), (2, 4), (3, 4), (3, 8), (4, 6), (4, 7), (5, 6), (5, 7), (6, 7)]
+# vertices = [1, 2, 3, 4, 5, 6, 7, 8]
+# edges = [(1, 3), (1, 4), (2, 3), (2, 4), (3, 4), (3, 8), (4, 6), (4, 7), (5, 6), (5, 7), (6, 7)]
 
-mygraph = Graph()
-mygraph.create(8, edges, kind='list')
-# print(mygraph)
+# mygraph = Graph()
+# mygraph.create(8, edges, kind='list')
+# # print(mygraph)
 
-mygraph.search(1)
+# mygraph.search(1)
 
 """ Testing the create_from_file function """
-# mygraph = Graph()
-# mygraph.create_from_file('test.txt', kind='list')
+mygraphlist = Graph()
+mygraphlist.create_from_file('test.txt', kind='list')
 # print(mygraph)
+
+mygraphlist.search(1)
+
+mygraphmatrix = Graph()
+mygraphmatrix.create_from_file('test.txt', kind='matrix')
+
+mygraphmatrix.search(1)
 
 #### TAIL ####
