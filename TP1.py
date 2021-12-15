@@ -1,5 +1,6 @@
 from collections import deque
 from queue import Queue, LifoQueue
+import math
 import copy
 
 #### Actual Code ####
@@ -140,12 +141,7 @@ class Graph:
                         self.bfsNivel[vizinhos[i] - 1] = self.bfsNivel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
                 self.bfsExplored.append(v)
 
-            # ordem dos vertices explorados
-            # vetor dos vertices pais: self.bfsPai[0] = 2 quer dizer que o vertice 2 eh o pai do vertice 1
-            # vetor do nivel dos vertices na arvore geradora, [0] corresponde ao vertice 1, etc. o nivel da origem eh 0
-            # print(self.bfsExplored) 
-            # print(self.bfsPai)
-            # print(self.bfsNivel)
+            return [self.bfsPai, self.bfsNivel]
 
         elif self.kind == 'matrix':
             self.bfsMarks = []
@@ -172,9 +168,7 @@ class Graph:
                             self.bfsNivel[i] = self.bfsNivel[self.bfsPai[i] - 1] + 1
                 self.bfsExplored.append(v)
             
-            # print(self.bfsExplored)
-            # print(self.bfsPai)
-            # print(self.bfsNivel)
+            return [self.bfsPai, self.bfsNivel]
 
         else:
             raise Exception('Invalid kind.')
@@ -206,9 +200,7 @@ class Graph:
                             self.dfsPai[vizinhos[i]-1] = v
                             self.dfsNivel[vizinhos[i] - 1] = self.dfsNivel[self.dfsPai[vizinhos[i] - 1] - 1] + 1
 
-            # print(self.dfsExplored)
-            # print(self.dfsPai)
-            # print(self.dfsNivel)
+            return [self.dfsPai, self.dfsNivel]
 
         elif self.kind == 'matrix':
             self.dfsMarks = []
@@ -236,12 +228,26 @@ class Graph:
                                 self.dfsPai[i] = v
                                 self.dfsNivel[i] = self.dfsNivel[self.dfsPai[i] - 1] + 1
 
-            # print(self.dfsExplored)
-            # print(self.dfsPai)
-            # print(self.dfsNivel)
+            return [self.dfsPai, self.dfsNivel]
 
         else:
             raise Exception('Invalid kind.')
+
+    def distancia(self, v1, v2):
+        bfsResult = self.__bfs__(v1)
+        nivel = bfsResult[1]
+
+        if (nivel[v2 - 1] == 0):
+            return math.inf
+        else:
+            return nivel[v2 - 1]
+
+    def diametro(self):
+        bfsResult = self.__bfs__(1)
+        nivel = bfsResult[1]
+        bfsResult = self.__bfs__(nivel.index(max(nivel))+1)
+        nivel = bfsResult[1]
+        return max(nivel)
 
 class Vertice:
     def __init__(self, id):
@@ -263,14 +269,8 @@ class Vertice:
 
 """ Testing the create_from_file function """
 mygraph = Graph()
-mygraph.create_from_file('test2.txt', kind='list')
-# print(mygraph)
-mygraph.search(1)
-
-mygraph2 = Graph()
-mygraph2.create_from_file('test2.txt', kind='matrix')
-# print(mygraph)
-mygraph2.search(1)
+mygraph.create_from_file('test.txt', kind='list')
+print(mygraph)
 
 
 #### TAIL ####
