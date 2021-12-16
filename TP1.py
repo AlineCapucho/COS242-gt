@@ -53,8 +53,9 @@ class Graph:
                     self.vertices.append(Vertice(i))
                 
                 for line in f.readlines():
-                    u = int(line[0])
-                    v = int(line[2])
+                    numbers = line.split()
+                    u = int(numbers[0])
+                    v = int(numbers[1])
 
                     self.vertices[u-1].vizinhos.append(v)
                     self.graus[u-1] += 1
@@ -68,8 +69,9 @@ class Graph:
                     self.matrix.append(deque(0 for j in range(ver)))
                 
                 for line in f.readlines():
-                    u = int(line[0])
-                    v = int(line[2])
+                    numbers = line.split()
+                    u = int(numbers[0])
+                    v = int(numbers[1])
 
                     self.matrix[u-1][v-1] = 1
                     self.graus[u-1] += 1
