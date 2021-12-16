@@ -11,16 +11,21 @@ class Graph:
         self.matrix = deque()
         self.kind = ''
         self.graus = deque()
+        self.n = 0 # Number of vertices
+        self.m = 0 # Number of edges
 
     def create(self, v, e, kind='list'):
         # This function must create the graph
         if kind == 'list':
             self.kind = 'list'
             for i in range(1, v+1):
+                self.n += 1
                 self.graus.append(0)
                 self.vertices.append(Vertice(i))
             
             for u, v in e:
+                self.m += 1
+
                 self.vertices[u-1].vizinhos.append(v)
                 self.graus[u-1] += 1
 
@@ -30,10 +35,13 @@ class Graph:
             self.kind = 'matrix'
 
             for i in range(v):
+                self.n += 1
                 self.graus.append(0)
                 self.matrix.append(deque(0 for j in range(v)))
 
             for u, v in e:
+                self.m += 1
+
                 self.matrix[u-1][v-1] = 1
                 self.graus[u-1] += 1
 
@@ -49,10 +57,13 @@ class Graph:
             if kind == 'list':
                 self.kind = 'list'
                 for i in range(1, ver+1):
+                    self.n += 1
                     self.graus.append(0)
                     self.vertices.append(Vertice(i))
                 
                 for line in f.readlines():
+                    self.m += 1
+
                     numbers = line.split()
                     u = int(numbers[0])
                     v = int(numbers[1])
@@ -61,14 +72,17 @@ class Graph:
                     self.graus[u-1] += 1
 
                     self.vertices[v-1].vizinhos.append(u)
-                    self.graus[u-1] += 1
+                    self.graus[v-1] += 1
             elif kind == 'matrix':
                 self.kind = 'matrix'
                 for i in range(ver):
+                    self.n += 1
                     self.graus.append(0)
                     self.matrix.append(deque(0 for j in range(ver)))
                 
                 for line in f.readlines():
+                    self.m += 1
+
                     numbers = line.split()
                     u = int(numbers[0])
                     v = int(numbers[1])
@@ -238,6 +252,27 @@ class Graph:
         nivel = bfsResult[1]
         return max(nivel)
 
+    def info(self, filename):
+        # This functions write in a file named filename information about the graph
+        if self.kind in ['list', 'matrix']:
+            with open(filename, 'w') as f:
+                info0 = "O grafo possui {} vértices e {} arestas.\n"\
+                    .format(str(self.n), str(self.m))
+                print('graus: {}'.format(str(self.graus)))
+                gmin = min(self.graus)
+                gmean = int(sum(self.graus)/self.n) # Média aritmética dos graus
+                gmedian = sorted(self.graus)[int(self.n/2)] # Grau central em uma lista ordenada
+                gmax = max(self.graus)
+
+                info1 = "Com respeito aos graus dos vértices do grafo temos que:\nGrau mínimo:" \
+                    + " {}\nGrau máximo: {}\nGrau médio: {}\nMediana do grau: {}".format(\
+                        str(gmin), str(gmax), str(gmean), str(gmedian))
+                
+                text = info0 + info1
+                f.write(text)
+        else:
+            raise Exception('Invalid kind.')
+
 class Vertice:
     def __init__(self, id):
         self.id = id
@@ -258,9 +293,13 @@ class Vertice:
 
 """ Testing the create_from_file function """
 mygraph = Graph()
-mygraph.create_from_file('test2.txt', kind='matrix')
+mygraph.create_from_file('test.txt', kind='matrix')
 print(mygraph)
 
+""" Testing the search function """
 print(mygraph.bfs(1))
+
+""" Testing the info function """
+mygraph.info('info.txt')
 
 #### TAIL ####
