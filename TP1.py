@@ -129,13 +129,13 @@ class Graph:
         if self.kind == 'list':
             self.bfsMarks = []
             self.bfsPai = []
-            self.bfsNivel = []
+            self.bfsLevel = []
             self.bfsQueue = deque()
 
             for i in range(len(self.vertices)):
                 self.bfsMarks.append(0)
                 self.bfsPai.append(0)
-                self.bfsNivel.append(0)
+                self.bfsLevel.append(0)
             self.bfsMarks[b-1] = 1
             self.bfsQueue.append(b)
 
@@ -148,20 +148,22 @@ class Graph:
                         self.bfsMarks[vizinhos[i]-1] = 1
                         self.bfsQueue.append(vizinhos[i])
                         self.bfsPai[vizinhos[i]-1] = v
-                        self.bfsNivel[vizinhos[i] - 1] = self.bfsNivel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
+                        self.bfsLevel[vizinhos[i] - 1] = self.bfsLevel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
 
-            return [self.bfsPai, self.bfsNivel]
+            with open('bfs.txt', 'w') as f:
+                for i in range(len(self.vertices)):
+                    f.write(str(i+1) + ' ' + str(self.bfsPai[i]) + ' ' + str(self.bfsLevel[i]) + '\n')
 
         elif self.kind == 'matrix':
             self.bfsMarks = []
             self.bfsPai = []
-            self.bfsNivel = []
+            self.bfsLevel = []
             self.bfsQueue = deque()
 
             for i in range(len(self.matrix[0])):
                 self.bfsMarks.append(0)
                 self.bfsPai.append(0)
-                self.bfsNivel.append(0)
+                self.bfsLevel.append(0)
             self.bfsMarks[b-1] = 1
             self.bfsQueue.append(b)
 
@@ -173,24 +175,23 @@ class Graph:
                             self.bfsMarks[i] = 1
                             self.bfsQueue.append(i+1)
                             self.bfsPai[i] = v
-                            self.bfsNivel[i] = self.bfsNivel[self.bfsPai[i] - 1] + 1
+                            self.bfsLevel[i] = self.bfsLevel[self.bfsPai[i] - 1] + 1
             
-            return [self.bfsPai, self.bfsNivel]
-
-        else:
-            raise Exception('Invalid kind.')
+            with open('bfs.txt', 'w') as f:
+                for i in range(len(self.matrix[0])):
+                    f.write(str(i+1) + ' ' + str(self.bfsPai[i]) + ' ' + str(self.bfsLevel[i]) + '\n')
 
     def dfs(self, b):
         if self.kind == 'list':
             self.dfsMarks = []
             self.dfsPai = []
-            self.dfsNivel = []
+            self.dfsLevel = []
             self.dfsStack = deque()
 
             for i in range(len(self.vertices)):
                 self.dfsMarks.append(0)
                 self.dfsPai.append(0)
-                self.dfsNivel.append(0)
+                self.dfsLevel.append(0)
         
             self.dfsStack.appendleft(b)
 
@@ -203,20 +204,20 @@ class Graph:
                         self.dfsStack.appendleft(vizinhos[i])
                         if(self.dfsMarks[vizinhos[i]-1] == 0):
                             self.dfsPai[vizinhos[i]-1] = v
-                            self.dfsNivel[vizinhos[i] - 1] = self.dfsNivel[self.dfsPai[vizinhos[i] - 1] - 1] + 1
+                            self.dfsLevel[vizinhos[i] - 1] = self.dfsLevel[self.dfsPai[vizinhos[i] - 1] - 1] + 1
 
-            return [self.dfsPai, self.dfsNivel]
+            return [self.dfsPai, self.dfsLevel]
 
         elif self.kind == 'matrix':
             self.dfsMarks = []
             self.dfsPai = []
-            self.dfsNivel = []
+            self.dfsLevel = []
             self.dfsStack = deque()
 
             for i in range(len(self.matrix[0])):
                 self.dfsMarks.append(0)
                 self.dfsPai.append(0)
-                self.dfsNivel.append(0)
+                self.dfsLevel.append(0)
 
             self.dfsStack.appendleft(b)
 
@@ -229,43 +230,117 @@ class Graph:
                             self.dfsStack.appendleft(i+1)
                             if(self.dfsMarks[i] == 0):
                                 self.dfsPai[i] = v
-                                self.dfsNivel[i] = self.dfsNivel[self.dfsPai[i] - 1] + 1
+                                self.dfsLevel[i] = self.dfsLevel[self.dfsPai[i] - 1] + 1
 
-            return [self.dfsPai, self.dfsNivel]
-
-        else:
-            raise Exception('Invalid kind.')
+            return [self.dfsPai, self.dfsLevel]
 
     def distancia(self, v1, v2):
         bfsResult = self.bfs(v1)
-        nivel = bfsResult[1]
+        level = bfsResult[1]
 
-        if (nivel[v2 - 1] == 0):
-            return math.inf
+        if (level[v2 - 1] == 0):
+            with open('distancia.txt', 'w') as f:
+                f.write(str(float('inf')) + '\n')
         else:
-            return nivel[v2 - 1]
-
+            with open('distancia.txt', 'w') as f:
+                f.write(str(level[v2 - 1]) + '\n')
+        
     def diametro(self):
         bfsResult = self.bfs(1)
-        nivel = bfsResult[1]
-        bfsResult = self.bfs(nivel.index(max(nivel))+1)
-        nivel = bfsResult[1]
-        return max(nivel)
+        level = bfsResult[1]
+        bfsResult = self.bfs(level.index(max(level))+1)
+        level = bfsResult[1]
+
+        with open('diametro.txt', 'w') as f:
+            f.write(str(max(level)) + '\n')
+
+    def conexos(self):
+        if(self.kind == 'list'):
+            aux = 1
+            marked = []
+            for i in range(len(self.vertices)):
+                marked.append(0)
+
+            for i in range (len(marked)):
+                if marked[i] == 0:
+                    bfsResults = self.__bfsConexos__(i+1)
+                    for j in range (len(bfsResults)):
+                        if bfsResults[j] == 1:
+                            marked[j] = aux
+                    aux += 1
+
+            return marked
+
+        elif(self.kind == 'matrix'):
+            aux = 1
+            marked = []
+            for i in range(len(self.matrix[0])):
+                marked.append(0)
+
+            for i in range (len(marked)):
+                if marked[i] == 0:
+                    bfsResults = self.__bfsConexos__(i+1)
+                    for j in range (len(bfsResults)):
+                        if bfsResults[j] == 1:
+                            marked[j] = aux
+                    aux += 1
+
+            return marked
+
+    def __bfsConexos__(self, b):
+        if self.kind == 'list':
+            self.bfsMarks = []
+            self.bfsQueue = deque()
+
+            for i in range(len(self.vertices)):
+                self.bfsMarks.append(0)
+            self.bfsMarks[b-1] = 1
+            self.bfsQueue.append(b)
+
+            while(self.bfsQueue):
+                v = self.bfsQueue.pop()
+                vizinhos = self.vertices[v-1].vizinhos
+
+                for i in range (len(vizinhos)):
+                    if self.bfsMarks[vizinhos[i]-1] == 0:
+                        self.bfsMarks[vizinhos[i]-1] = 1
+                        self.bfsQueue.append(vizinhos[i])
+
+            return self.bfsMarks
+
+        elif self.kind == 'matrix':
+            self.bfsMarks = []
+            self.bfsQueue = deque()
+
+            for i in range(len(self.matrix[0])):
+                self.bfsMarks.append(0)
+            self.bfsMarks[b-1] = 1
+            self.bfsQueue.append(b)
+
+            while(self.bfsQueue):
+                v = self.bfsQueue.pop()
+                for i in range(len(self.matrix[0])):
+                    if self.matrix[v-1][i] == 1:
+                        if self.bfsMarks[i] == 0:
+                            self.bfsMarks[i] = 1
+                            self.bfsQueue.append(i+1)
+            
+            return self.bfsMarks
 
     def info(self, filename):
         # This functions write in a file named filename information about the graph
         if self.kind in ['list', 'matrix']:
             with open(filename, 'w') as f:
-                info0 = "O grafo possui {} vértices e {} arestas.\n"\
+                info0 = "O grafo possui {} vertices e {} arestas.\n"\
                     .format(str(self.n), str(self.m))
                 print('graus: {}'.format(str(self.graus)))
                 gmin = min(self.graus)
-                gmean = int(sum(self.graus)/self.n) # Média aritmética dos graus
+                gmean = int(sum(self.graus)/self.n) # Media aritmetica dos graus
                 gmedian = sorted(self.graus)[int(self.n/2)] # Grau central em uma lista ordenada
                 gmax = max(self.graus)
 
-                info1 = "Com respeito aos graus dos vértices do grafo temos que:\nGrau mínimo:" \
-                    + " {}\nGrau máximo: {}\nGrau médio: {}\nMediana do grau: {}".format(\
+                info1 = "Com respeito aos graus dos vertices do grafo temos que:\nGrau minimo:" \
+                    + " {}\nGrau maximo: {}\nGrau medio: {}\nMediana do grau: {}".format(\
                         str(gmin), str(gmax), str(gmean), str(gmedian))
                 
                 text = info0 + info1
@@ -277,7 +352,7 @@ class Vertice:
     def __init__(self, id):
         self.id = id
         self.vizinhos = deque()
-        self.nivel = 0
+        self.level = 0
 
 #### Testing ####
 
@@ -297,9 +372,11 @@ mygraph.create_from_file('test.txt', kind='matrix')
 print(mygraph)
 
 """ Testing the search function """
-print(mygraph.bfs(1))
+mygraph.bfs(1)
 
 """ Testing the info function """
 mygraph.info('info.txt')
 
+""" Testing the connected graphs function """
+print(mygraph.conexos())
 #### TAIL ####
