@@ -134,13 +134,14 @@ class Graph:
 
             for i in range(len(self.vertices)):
                 self.bfsMarks.append(0)
-                self.bfsPai.append(0)
-                self.bfsLevel.append(0)
+                self.bfsPai.append(-1)
+                self.bfsLevel.append(-1)
             self.bfsMarks[b-1] = 1
+            self.bfsLevel[b-1] = 0
             self.bfsQueue.append(b)
 
             while(self.bfsQueue):
-                v = self.bfsQueue.pop()
+                v = self.bfsQueue.popleft()
                 vizinhos = self.vertices[v-1].vizinhos
 
                 for i in range (len(vizinhos)):
@@ -162,13 +163,14 @@ class Graph:
 
             for i in range(len(self.matrix[0])):
                 self.bfsMarks.append(0)
-                self.bfsPai.append(0)
-                self.bfsLevel.append(0)
+                self.bfsPai.append(-1)
+                self.bfsLevel.append(-1)
             self.bfsMarks[b-1] = 1
+            self.bfsLevel[b-1] = 0
             self.bfsQueue.append(b)
 
             while(self.bfsQueue):
-                v = self.bfsQueue.pop()
+                v = self.bfsQueue.popleft()
                 for i in range(len(self.matrix[0])):
                     if self.matrix[v-1][i] == 1:
                         if self.bfsMarks[i] == 0:
@@ -368,7 +370,7 @@ class Vertice:
 
 """ Testing the create_from_file function """
 mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='matrix')
+mygraph.create_from_file('test2.txt', kind='matrix')
 print(mygraph)
 
 """ Testing the search function """
