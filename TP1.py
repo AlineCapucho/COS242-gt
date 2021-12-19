@@ -152,6 +152,13 @@ class Graph:
                         self.bfsLevel[vizinhos[i] - 1] = self.bfsLevel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
 
             with open('bfs.txt', 'w') as f:
+                f.write("A seguir está uma representação de uma bfs realizada no vértice pedido."+
+                " Cada\nlinha é composta por três números, onde o primeiro número representa"+\
+                    " um\nvértice, o segundo número quem é o pai desse vértice e o terceiro"+\
+                    " número qual\no nível desse vértice. Um vértice que possui pai -1"+\
+                    " significa um vértice raiz\nde uma árvore geradora. Um vértice que"+\
+                    " possui nível -1 significa um vértice\ndesconexo do componente"+\
+                    " conexo em que foi realizado a bfs.\n\n")
                 for i in range(len(self.vertices)):
                     f.write(str(i+1) + ' ' + str(self.bfsPai[i]) + ' ' + str(self.bfsLevel[i]) + '\n')
 
@@ -180,6 +187,13 @@ class Graph:
                             self.bfsLevel[i] = self.bfsLevel[self.bfsPai[i] - 1] + 1
             
             with open('bfs.txt', 'w') as f:
+                f.write("A seguir está uma representação de uma bfs realizada no vértice pedido."+
+                " Cada\nlinha é composta por três números, onde o primeiro número representa"+\
+                    " um\nvértice, o segundo número quem é o pai desse vértice e o terceiro"+\
+                    " número qual\no nível desse vértice. Um vértice que possui pai -1"+\
+                    " significa um vértice raiz\nde uma árvore geradora. Um vértice que"+\
+                    " possui nível -1 significa um vértice\ndesconexo do componente"+\
+                    " conexo em que foi realizado a bfs.\n\n")
                 for i in range(len(self.matrix[0])):
                     f.write(str(i+1) + ' ' + str(self.bfsPai[i]) + ' ' + str(self.bfsLevel[i]) + '\n')
 
@@ -192,9 +206,10 @@ class Graph:
 
             for i in range(len(self.vertices)):
                 self.dfsMarks.append(0)
-                self.dfsPai.append(0)
-                self.dfsLevel.append(0)
+                self.dfsPai.append(-1)
+                self.dfsLevel.append(-1)
         
+            self.dfsLevel[b-1] = 0
             self.dfsStack.appendleft(b)
 
             while(self.dfsStack):
@@ -209,6 +224,13 @@ class Graph:
                             self.dfsLevel[vizinhos[i] - 1] = self.dfsLevel[self.dfsPai[vizinhos[i] - 1] - 1] + 1
             
             with open('dfs.txt', 'w') as f:
+                f.write("A seguir está uma representação de uma dfs realizada no vértice pedido."+
+                " Cada\nlinha é composta por três números, onde o primeiro número representa"+\
+                    " um\nvértice, o segundo número quem é o pai desse vértice e o terceiro"+\
+                    " número qual\no nível desse vértice. Um vértice que possui pai -1"+\
+                    " significa um vértice raiz\nde uma árvore geradora. Um vértice que"+\
+                    " possui nível -1 significa um vértice\ndesconexo do componente"+\
+                    " conexo em que foi realizado a dfs.\n\n")
                 for i in range(len(self.vertices)):
                     f.write(str(i+1) + ' ' + str(self.dfsPai[i]) + ' ' + str(self.dfsLevel[i]) + '\n')
 
@@ -220,9 +242,10 @@ class Graph:
 
             for i in range(len(self.matrix[0])):
                 self.dfsMarks.append(0)
-                self.dfsPai.append(0)
-                self.dfsLevel.append(0)
+                self.dfsPai.append(-1)
+                self.dfsLevel.append(-1)
 
+            self.dfsLevel[b-1] = 0
             self.dfsStack.appendleft(b)
 
             while(self.dfsStack):
@@ -237,6 +260,13 @@ class Graph:
                                 self.dfsLevel[i] = self.dfsLevel[self.dfsPai[i] - 1] + 1
 
             with open('dfs.txt', 'w') as f:
+                f.write("A seguir está uma representação de uma dfs realizada no vértice pedido."+
+                " Cada\nlinha é composta por três números, onde o primeiro número representa"+\
+                    " um\nvértice, o segundo número quem é o pai desse vértice e o terceiro"+\
+                    " número qual\no nível desse vértice. Um vértice que possui pai -1"+\
+                    " significa um vértice raiz\nde uma árvore geradora. Um vértice que"+\
+                    " possui nível -1 significa um vértice\ndesconexo do componente"+\
+                    " conexo em que foi realizado a dfs.\n\n")
                 for i in range(len(self.matrix[0])):
                     f.write(str(i+1) + ' ' + str(self.dfsPai[i]) + ' ' + str(self.dfsLevel[i]) + '\n')
 
@@ -406,7 +436,7 @@ mygraph.create_from_file('test.txt', kind='matrix')
 print(mygraph)
 
 """ Testing the search function """
-mygraph.dfs(5)
+mygraph.bfs(5)
 
 """ Testing the info function """
 mygraph.info('info.txt')
