@@ -1,16 +1,17 @@
 from collections import deque
 import math
 import copy
+import time
 
 #### Actual Code ####
 
 class Graph:
     def __init__(self):
         # Initially, just initialize the deque and does nothing more
-        self.vertices = deque()
-        self.matrix = deque()
+        self.vertices = []
+        self.matrix = []
         self.kind = ''
-        self.graus = deque()
+        self.graus = []
         self.n = 0 # Number of vertices
         self.m = 0 # Number of edges
 
@@ -37,7 +38,7 @@ class Graph:
             for i in range(v):
                 self.n += 1
                 self.graus.append(0)
-                self.matrix.append(deque(0 for j in range(v)))
+                self.matrix.append([0 for j in range(v)])
 
             for u, v in e:
                 self.m += 1
@@ -78,7 +79,7 @@ class Graph:
                 for i in range(ver):
                     self.n += 1
                     self.graus.append(0)
-                    self.matrix.append(deque(0 for j in range(ver)))
+                    self.matrix.append([0 for j in range(ver)])
                 
                 for line in f.readlines():
                     self.m += 1
@@ -416,7 +417,6 @@ class Vertice:
     def __init__(self, id):
         self.id = id
         self.vizinhos = deque()
-        self.level = 0
 
 #### Testing ####
 
@@ -431,16 +431,24 @@ class Vertice:
 # mygraph.search(1)
 
 """ Testing the create_from_file function """
-mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='matrix')
-print(mygraph)
+# mygraph = Graph()
+# mygraph.create_from_file('test.txt', kind='matrix')
+# print(mygraph)
 
 """ Testing the search function """
-mygraph.bfs(5)
+# mygraph.bfs(5)
 
 """ Testing the info function """
-mygraph.info('info.txt')
+# mygraph.info('info.txt')
 
 """ Testing the connected graphs function """
-print(mygraph.conexos())
+# print(mygraph.conexos())
+
+""" Estudo de Casos """
+mygraph = Graph()
+startTime = time.time()
+mygraph.create_from_file('grafo_6.txt', kind='list')
+executionTime = time.time() - startTime
+print("Tempo de execução: {} segundos".format(str(executionTime)))
+
 #### TAIL ####
