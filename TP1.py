@@ -207,8 +207,10 @@ class Graph:
                         if(self.dfsMarks[vizinhos[i]-1] == 0):
                             self.dfsPai[vizinhos[i]-1] = v
                             self.dfsLevel[vizinhos[i] - 1] = self.dfsLevel[self.dfsPai[vizinhos[i] - 1] - 1] + 1
-
-            return [self.dfsPai, self.dfsLevel]
+            
+            with open('dfs.txt', 'w') as f:
+                for i in range(len(self.vertices)):
+                    f.write(str(i+1) + ' ' + str(self.dfsPai[i]) + ' ' + str(self.dfsLevel[i]) + '\n')
 
         elif self.kind == 'matrix':
             self.dfsMarks = []
@@ -234,7 +236,9 @@ class Graph:
                                 self.dfsPai[i] = v
                                 self.dfsLevel[i] = self.dfsLevel[self.dfsPai[i] - 1] + 1
 
-            return [self.dfsPai, self.dfsLevel]
+            with open('dfs.txt', 'w') as f:
+                for i in range(len(self.matrix[0])):
+                    f.write(str(i+1) + ' ' + str(self.dfsPai[i]) + ' ' + str(self.dfsLevel[i]) + '\n')
 
     def distancia(self, v1, v2):
         bfsResult = self.bfs(v1)
@@ -300,7 +304,7 @@ class Graph:
             self.bfsQueue.append(b)
 
             while(self.bfsQueue):
-                v = self.bfsQueue.pop()
+                v = self.bfsQueue.popleft()
                 vizinhos = self.vertices[v-1].vizinhos
 
                 for i in range (len(vizinhos)):
@@ -320,7 +324,7 @@ class Graph:
             self.bfsQueue.append(b)
 
             while(self.bfsQueue):
-                v = self.bfsQueue.pop()
+                v = self.bfsQueue.popleft()
                 for i in range(len(self.matrix[0])):
                     if self.matrix[v-1][i] == 1:
                         if self.bfsMarks[i] == 0:
@@ -335,17 +339,45 @@ class Graph:
             with open(filename, 'w') as f:
                 info0 = "O grafo possui {} vertices e {} arestas.\n"\
                     .format(str(self.n), str(self.m))
-                print('graus: {}'.format(str(self.graus)))
+
                 gmin = min(self.graus)
                 gmean = int(sum(self.graus)/self.n) # Media aritmetica dos graus
                 gmedian = sorted(self.graus)[int(self.n/2)] # Grau central em uma lista ordenada
                 gmax = max(self.graus)
 
                 info1 = "Com respeito aos graus dos vertices do grafo temos que:\nGrau minimo:" \
-                    + " {}\nGrau maximo: {}\nGrau medio: {}\nMediana do grau: {}".format(\
+                    + " {}\nGrau maximo: {}\nGrau medio: {}\nMediana do grau: {}\n".format(\
                         str(gmin), str(gmax), str(gmean), str(gmedian))
+
+                info2 = "A seguir estão os componentes conexos do grafo em questão:\n"
+
+                conexos_list = self.conexos()
+                conexos_dict = {}
+
+                for i in range(len(conexos_list)):
+                    key = str(conexos_list[i])
+                    if (str(conexos_list[i]) in conexos_dict.keys()):
+                        conexos_dict[key].append(i+1)
+                    else:
+                        conexos_dict[key] = [i+1]
                 
-                text = info0 + info1
+                conexos_dict = sorted(conexos_dict.items(), key=lambda x: len(x[1]), reverse=True)
+
+                print(conexos_dict)
+
+                count = 0
+                for key, values in conexos_dict:
+                    info2 += "Componente {} possui {} vértices e é composto pelos vértices: "\
+                        .format(str(count), str(len(values)))
+                    
+                    for v in values:
+                        info2 += "{}, ".format(str(v))
+                    info2 = info2.rstrip(', ')
+                    info2 += "\n"
+
+                    count += 1
+                
+                text = info0 + info1 + info2
                 f.write(text)
         else:
             raise Exception('Invalid kind.')
@@ -370,11 +402,11 @@ class Vertice:
 
 """ Testing the create_from_file function """
 mygraph = Graph()
-mygraph.create_from_file('test2.txt', kind='matrix')
+mygraph.create_from_file('test.txt', kind='matrix')
 print(mygraph)
 
 """ Testing the search function """
-mygraph.bfs(1)
+mygraph.dfs(5)
 
 """ Testing the info function """
 mygraph.info('info.txt')
