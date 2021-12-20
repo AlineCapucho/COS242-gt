@@ -1,6 +1,0 @@
-O grafo possui 8 vertices e 6 arestas.
-Com respeito aos graus dos vertices do grafo temos que:
-Grau minimo: 0
-Grau maximo: 3
-Grau medio: 1
-Mediana do grau: 2

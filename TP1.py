@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from collections import deque
 import math
 import copy
@@ -127,6 +128,7 @@ class Graph:
             raise Exception('This graph was not initialized')
 
     def bfs(self, b):
+        # Makes a breadth-first search on the graph using b as the root
         if self.kind == 'list':
             self.bfsMarks = []
             self.bfsPai = []
@@ -199,6 +201,7 @@ class Graph:
                     f.write(str(i+1) + ' ' + str(self.bfsPai[i]) + ' ' + str(self.bfsLevel[i]) + '\n')
 
     def dfs(self, b):
+        # Makes a depth-first search on the graph using b as the root
         if self.kind == 'list':
             self.dfsMarks = []
             self.dfsPai = []
@@ -272,8 +275,9 @@ class Graph:
                     f.write(str(i+1) + ' ' + str(self.dfsPai[i]) + ' ' + str(self.dfsLevel[i]) + '\n')
 
     def distancia(self, v1, v2):
-        bfsResult = self.bfs(v1)
-        level = bfsResult[1]
+        # Determines the distance between two vertices
+        bfsResult = self.__bfsD__(v1)
+        level = bfsResult
 
         if (level[v2 - 1] == 0):
             with open('distancia.txt', 'w') as f:
@@ -283,15 +287,17 @@ class Graph:
                 f.write(str(level[v2 - 1]) + '\n')
         
     def diametro(self):
-        bfsResult = self.bfs(1)
-        level = bfsResult[1]
-        bfsResult = self.bfs(level.index(max(level))+1)
-        level = bfsResult[1]
+        # Determines the diameter of a given graph
+        bfsResult = self.__bfsD__(1)
+        level = bfsResult
+        bfsResult = self.__bfsD__(level.index(max(level))+1)
+        level = bfsResult
 
         with open('diametro.txt', 'w') as f:
             f.write(str(max(level)) + '\n')
 
     def conexos(self):
+        # Determines the connected components of a given graph
         if(self.kind == 'list'):
             aux = 1
             marked = []
@@ -325,6 +331,8 @@ class Graph:
             return marked
 
     def __bfsConexos__(self, b):
+        #  Makes a breadth-first search on the graph using b as the root
+        # returns a list with all the marked vertices in that search
         if self.kind == 'list':
             self.bfsMarks = []
             self.bfsQueue = deque()
@@ -363,6 +371,60 @@ class Graph:
                             self.bfsQueue.append(i+1)
             
             return self.bfsMarks
+
+    def __bfsD__(self, b):
+        if self.kind == 'list':
+            self.bfsMarks = []
+            self.bfsPai = []
+            self.bfsLevel = []
+            self.bfsQueue = deque()
+
+            for i in range(len(self.vertices)):
+                self.bfsMarks.append(0)
+                self.bfsPai.append(-1)
+                self.bfsLevel.append(-1)
+            self.bfsMarks[b-1] = 1
+            self.bfsLevel[b-1] = 0
+            self.bfsQueue.append(b)
+
+            while(self.bfsQueue):
+                v = self.bfsQueue.popleft()
+                vizinhos = self.vertices[v-1].vizinhos
+
+                for i in range (len(vizinhos)):
+                    if self.bfsMarks[vizinhos[i]-1] == 0:
+                        self.bfsMarks[vizinhos[i]-1] = 1
+                        self.bfsQueue.append(vizinhos[i])
+                        self.bfsPai[vizinhos[i]-1] = v
+                        self.bfsLevel[vizinhos[i] - 1] = self.bfsLevel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
+
+            return self.bfsLevel
+
+        elif self.kind == 'matrix':
+            self.bfsMarks = []
+            self.bfsPai = []
+            self.bfsLevel = []
+            self.bfsQueue = deque()
+
+            for i in range(len(self.matrix[0])):
+                self.bfsMarks.append(0)
+                self.bfsPai.append(-1)
+                self.bfsLevel.append(-1)
+            self.bfsMarks[b-1] = 1
+            self.bfsLevel[b-1] = 0
+            self.bfsQueue.append(b)
+
+            while(self.bfsQueue):
+                v = self.bfsQueue.popleft()
+                for i in range(len(self.matrix[0])):
+                    if self.matrix[v-1][i] == 1:
+                        if self.bfsMarks[i] == 0:
+                            self.bfsMarks[i] = 1
+                            self.bfsQueue.append(i+1)
+                            self.bfsPai[i] = v
+                            self.bfsLevel[i] = self.bfsLevel[self.bfsPai[i] - 1] + 1
+            
+            return self.bfsLevel
 
     def info(self, filename):
         # This functions write in a file named filename information about the graph
@@ -447,7 +509,7 @@ class Vertice:
 """ Estudo de Casos """
 mygraph = Graph()
 startTime = time.time()
-mygraph.create_from_file('grafo_6.txt', kind='list')
+mygraph.create_from_file('grafo_1.txt', kind='list')
 executionTime = time.time() - startTime
 print("Tempo de execução: {} segundos".format(str(executionTime)))
 
