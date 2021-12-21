@@ -3,6 +3,9 @@ from collections import deque
 import math
 import copy
 import time
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 #### Actual Code ####
 
@@ -511,10 +514,39 @@ class Vertice:
 # print(mygraph.conexos())
 
 """ Estudo de Casos """
-mygraph = Graph()
-startTime = time.time()
-mygraph.create_from_file('grafo_1.txt', kind='list')
-executionTime = time.time() - startTime
-print("Tempo de execução: {} segundos".format(str(executionTime)))
+# mygraph = Graph()
+# mygraph.create_from_file('grafo_1.txt', kind='list')
+
+# with open('bfstimersgrafo1.txt', 'a') as f:
+#     for i in range(1, 1000+1):
+#         v = i % 100
+#         if (v == 0):
+#             v = 100
+#         startTime = time.time()
+#         mygraph.bfs(v)
+#         executionTime = time.time() - startTime
+#         print("Tempo de execução da bfs: {} segundos".format(str(executionTime)))
+#         f.write('{} {}\n'.format(v, executionTime))
+
+""" Gerando os gráficos """
+
+fig, ax = plt.subplots()
+
+df0 = pd.read_csv('bfstimersgrafo6.txt', sep=' ')
+
+df0['time'] = df0['time'] * 1000
+
+# ax.bar(df0['vertice'], df0['time'])
+ax.hist(df0['time'], bins=30)
+
+ax.set_title('Time required for the BFS in each vertice')
+ax.set_xlabel('Vertice')
+ax.set_ylabel('Time required (ms)')
+ax.tick_params(which='minor', width=0.75, length=2.5)
+# ax.set_xlim(0, 1000)
+# ax.set_yticks(np.arange(0, 7, 0.5))
+fig.set_size_inches([8, 6])
+
+plt.show()
 
 #### TAIL ####
