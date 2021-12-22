@@ -1,5 +1,13 @@
 from TP1 import Graph, Vertice
 
+""" Estudo de Casos Pergunta 1 """
+mygraph = Graph()
+mygraph.create_from_file('grafo_4.txt', kind='matrix')
+
+c = 1
+while True:
+    c = 1
+
 """ Estudo de Casos Pergunta 2 """
 # mygraph = Graph()
 # mygraph.create_from_file('grafo_1.txt', kind='list')

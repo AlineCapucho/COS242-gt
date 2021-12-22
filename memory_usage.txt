@@ -1,0 +1,15 @@
+Memória usada com lista de adjacência para o grafo:
+1: 72092 KiB
+2: 73924 KiB
+3: 107812 KiB
+4: 432140 KiB
+5: 2,2 GiB
+6: 9,6 GiB
+
+Memória usada com matriz de adjacência para o grafo:
+1: 71648 KiB
+2: 79856 KiB
+3: 894004 KiB
+4: 13,5 GiB
+5: 13,1 GiB
+6:
