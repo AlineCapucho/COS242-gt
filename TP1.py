@@ -5,7 +5,7 @@ import math
 import copy
 import time
 # import numpy as np
-# import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 
 #### Actual Code ####
@@ -291,7 +291,27 @@ class Graph:
                 f.write(str(level[v2 - 1]) + '\n')
         
     def diametro(self):
-        # Determines the diameter of a given graph
+        # Determines the diameter of a given graph by calculating the diameter in the
+        # biggest connected component
+        if (self.n > 1000):
+            self.diametro2()
+        else:
+            conexos_list = self.conexos()
+            conexos_dict = {i:conexos_list.count(i) for i in conexos_list}
+
+            connected = max(conexos_dict, key=conexos_dict.get)
+
+            biggest_connected = [i+1 for i in range(len(conexos_list)) if conexos_list[i] == connected]
+
+            bfsResults = [self.__bfsD__(i) for i in biggest_connected]
+            maxlevels = [max(levels) for levels in bfsResults]
+
+            with open('diametro.txt', 'w') as f:
+                f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
+
+    def diametro2(self):
+        # Determines the diameter of a given graph by randomly selecting k = log_2 n
+        # vertices, calculating the diameter in these vertices and choosing the biggest one
         conexos_list = self.conexos()
         conexos_dict = {i:conexos_list.count(i) for i in conexos_list}
 
@@ -299,14 +319,32 @@ class Graph:
 
         bigger_connected = [i+1 for i in range(len(conexos_list)) if conexos_list[i] == connected]
 
+        k = math.floor(math.log2(self.n))
         choices = []
-        for i in range(int(len(bigger_connected) / 2)):
+        for i in range(k):
             choice = random.choice(bigger_connected)
             while (choice in choices):
                 choice = random.choice(bigger_connected)
             choices.append(choice)
 
         bfsResults = [self.__bfsD__(i) for i in choices]
+        maxlevels = [max(levels) for levels in bfsResults]
+
+        with open('diametro.txt', 'w') as f:
+            f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
+
+    def diametro_txt(self, filename):
+        # Calculates the diameter of a graph by choosing k=log_2 n vertices from a txt file
+        # that contains the time required to perform a bfs in 1000 vertices, and performing
+        # bfs in these vertices.
+        # Here we are supposing that the diameter can be found performing some bfs
+        # in the vertices that took longer to do the bfs when creating the txt file.
+        k = math.floor(math.log2(self.n))
+        df0 = pd.read_csv(filename, sep=' ')
+        df0.sort_values('time', ascending=False, inplace=True, ignore_index=True)
+        btv = df0.iloc[:k]['vertice'] # Biggest time vertices
+
+        bfsResults = [self.__bfsD__(i) for i in btv]
         maxlevels = [max(levels) for levels in bfsResults]
 
         with open('diametro.txt', 'w') as f:
@@ -509,12 +547,18 @@ class Vertice:
 # mygraph.search(1)
 
 """ Testing the create_from_file function """
-mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='list')
+# mygraph = Graph()
+# mygraph.create_from_file('test.txt', kind='list')
 # print(mygraph)
 
 """ Testing the search function """
-mygraph.diametro()
+# mygraph.diametro()
+
+""" Testing the diametro_txt function """
+# mygraph = Graph()
+# mygraph.create_from_file('grafo_6.txt', kind='list')
+# mygraph.diametro()
+# mygraph.diametro_txt('bfstimersgrafo6.txt')
 
 """ Testing the info function """
 # mygraph.info('info.txt')
@@ -522,10 +566,14 @@ mygraph.diametro()
 """ Testing the connected graphs function """
 # print(mygraph.conexos())
 
-""" Estudo de Casos """
+""" Estudo de Casos Pergunta 2 """
 # mygraph = Graph()
 # mygraph.create_from_file('grafo_1.txt', kind='list')
 
+# Os tempos de execução das bfs foram calculados para diferentes vértices e armazenados em um txt
+# A forma como fizemos isso está exemplificada no código a seguir. No caso de grafos com pelo
+# menos 1000 vértices, não foi necessário calcular o mod do número do vértice que a bfs será
+# realizada.
 # with open('bfstimersgrafo1.txt', 'a') as f:
 #     for i in range(1, 1000+1):
 #         v = i % 100
