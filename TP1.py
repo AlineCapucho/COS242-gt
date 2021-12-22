@@ -300,15 +300,11 @@ class Graph:
 
         bfsResult = self.__bfsD__(first)
         level = bfsResult
-        if(-1 in bfsResult):
-            with open('diametro.txt', 'w') as f:
-                f.write(str(-1) + '\n')
-        else:
-            bfsResult = self.__bfsD__(level.index(max(level))+1)
-            level = bfsResult
+        bfsResult = self.__bfsD__(level.index(max(level))+1)
+        level = bfsResult
 
-            with open('diametro.txt', 'w') as f:
-                f.write(str(max(level)) + '\n')
+        with open('diametro.txt', 'w') as f:
+            f.write(str(max(level)) + '\n')
 
     def conexos(self):
         # Determines the connected components of a given graph
@@ -507,12 +503,12 @@ class Vertice:
 # mygraph.search(1)
 
 """ Testing the create_from_file function """
-# mygraph = Graph()
-# mygraph.create_from_file('grafo_2.txt', kind='matrix')
+mygraph = Graph()
+mygraph.create_from_file('test.txt', kind='list')
 # print(mygraph)
 
 """ Testing the search function """
-# mygraph.bfs(1)
+mygraph.diametro()
 
 """ Testing the info function """
 # mygraph.info('info.txt')
