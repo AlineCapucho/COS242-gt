@@ -3,8 +3,8 @@ from collections import deque
 import math
 import copy
 import time
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 import matplotlib.pyplot as plt
 
 #### Actual Code ####
@@ -291,7 +291,14 @@ class Graph:
         
     def diametro(self):
         # Determines the diameter of a given graph
-        bfsResult = self.__bfsD__(1)
+        conexos_list = self.conexos()
+        conexos_dict = {i:conexos_list.count(i) for i in conexos_list}
+
+        connected = max(conexos_dict, key=conexos_dict.get)
+
+        first = conexos_list.index(connected) + 1
+
+        bfsResult = self.__bfsD__(first)
         level = bfsResult
         if(-1 in bfsResult):
             with open('diametro.txt', 'w') as f:
@@ -501,11 +508,11 @@ class Vertice:
 
 """ Testing the create_from_file function """
 # mygraph = Graph()
-# mygraph.create_from_file('test.txt', kind='matrix')
+# mygraph.create_from_file('grafo_2.txt', kind='matrix')
 # print(mygraph)
 
 """ Testing the search function """
-# mygraph.bfs(5)
+# mygraph.bfs(1)
 
 """ Testing the info function """
 # mygraph.info('info.txt')
@@ -530,23 +537,23 @@ class Vertice:
 
 """ Gerando os gráficos """
 
-fig, ax = plt.subplots()
+# fig, ax = plt.subplots()
 
-df0 = pd.read_csv('bfstimersgrafo6.txt', sep=' ')
+# df0 = pd.read_csv('bfstimersgrafo6.txt', sep=' ')
 
-df0['time'] = df0['time'] * 1000
+# df0['time'] = df0['time'] * 1000
 
-# ax.bar(df0['vertice'], df0['time'])
-ax.hist(df0['time'], bins=30)
+# # ax.bar(df0['vertice'], df0['time'])
+# ax.hist(df0['time'], bins=30)
 
-ax.set_title('Time required for the BFS in each vertice')
-ax.set_xlabel('Vertice')
-ax.set_ylabel('Time required (ms)')
-ax.tick_params(which='minor', width=0.75, length=2.5)
-# ax.set_xlim(0, 1000)
-# ax.set_yticks(np.arange(0, 7, 0.5))
-fig.set_size_inches([8, 6])
+# ax.set_title('Time required for the BFS in each vertice')
+# ax.set_xlabel('Vertice')
+# ax.set_ylabel('Time required (ms)')
+# ax.tick_params(which='minor', width=0.75, length=2.5)
+# # ax.set_xlim(0, 1000)
+# # ax.set_yticks(np.arange(0, 7, 0.5))
+# fig.set_size_inches([8, 6])
 
-plt.show()
+# plt.show()
 
 #### TAIL ####
