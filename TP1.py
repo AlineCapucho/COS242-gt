@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import deque
+import random
 import math
 import copy
 import time
@@ -296,15 +297,20 @@ class Graph:
 
         connected = max(conexos_dict, key=conexos_dict.get)
 
-        first = conexos_list.index(connected) + 1
+        bigger_connected = [i+1 for i in range(len(conexos_list)) if conexos_list[i] == connected]
 
-        bfsResult = self.__bfsD__(first)
-        level = bfsResult
-        bfsResult = self.__bfsD__(level.index(max(level))+1)
-        level = bfsResult
+        choices = []
+        for i in range(int(len(bigger_connected) / 2)):
+            choice = random.choice(bigger_connected)
+            while (choice in choices):
+                choice = random.choice(bigger_connected)
+            choices.append(choice)
+
+        bfsResults = [self.__bfsD__(i) for i in choices]
+        maxlevels = [max(levels) for levels in bfsResults]
 
         with open('diametro.txt', 'w') as f:
-            f.write(str(max(level)) + '\n')
+            f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
 
     def conexos(self):
         # Determines the connected components of a given graph
