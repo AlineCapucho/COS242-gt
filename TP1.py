@@ -307,7 +307,7 @@ class Graph:
             bfsResults = [self.__bfsD__(i) for i in biggest_connected]
             maxlevels = [max(levels) for levels in bfsResults]
 
-            with open('diametro.txt', 'a') as f:
+            with open('diametro.txt', 'w') as f:
                 f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
 
     def diametro2(self):
