@@ -1,12 +1,13 @@
 from TP1 import Graph, Vertice
 
-""" Estudo de Casos Pergunta 1 """
-mygraph = Graph()
-mygraph.create_from_file('grafo_4.txt', kind='matrix')
+# """ Estudo de Casos Pergunta 1 """
+# mygraph = Graph()
+# mygraph.create_from_file('grafo_4.txt', kind='matrix')
 
-c = 1
-while True:
-    c = 1
+# Esse while loop é para manter o código rodando enquanto eu verifico o consumo de memória
+# c = 1
+# while True:
+#     c = 1
 
 """ Estudo de Casos Pergunta 2 """
 # mygraph = Graph()
@@ -47,5 +48,10 @@ while True:
 # fig.set_size_inches([8, 6])
 
 # plt.show()
+
+""" Estudo de Casos Pergunta 7 """
+# mygraph = Graph()
+# mygraph.create_from_file("grafo_2.txt", kind='list')
+# mygraph.diametro()
 
 ### TAIL ###

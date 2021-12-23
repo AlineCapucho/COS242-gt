@@ -294,10 +294,11 @@ class Graph:
         # Determines the diameter of a given graph by calculating the diameter in the
         # biggest connected component
         if (self.n > 1000):
+            print("Indo para diametro2")
             self.diametro2()
         else:
             conexos_list = self.conexos()
-            conexos_dict = {i:conexos_list.count(i) for i in conexos_list}
+            conexos_dict = {i:conexos_list.count(i) for i in set(conexos_list)}
 
             connected = max(conexos_dict, key=conexos_dict.get)
 
@@ -306,46 +307,27 @@ class Graph:
             bfsResults = [self.__bfsD__(i) for i in biggest_connected]
             maxlevels = [max(levels) for levels in bfsResults]
 
-            with open('diametro.txt', 'w') as f:
+            with open('diametro.txt', 'a') as f:
                 f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
 
     def diametro2(self):
         # Determines the diameter of a given graph by randomly selecting k = log_2 n
         # vertices, calculating the diameter in these vertices and choosing the biggest one
-        conexos_list = self.conexos()
-        conexos_dict = {i:conexos_list.count(i) for i in conexos_list}
-
-        connected = max(conexos_dict, key=conexos_dict.get)
-
-        bigger_connected = [i+1 for i in range(len(conexos_list)) if conexos_list[i] == connected]
 
         k = math.floor(math.log2(self.n))
         choices = []
         for i in range(k):
-            choice = random.choice(bigger_connected)
+            choice = random.randint(1, self.n)
             while (choice in choices):
-                choice = random.choice(bigger_connected)
+                choice = random.randint(1, self.n)
             choices.append(choice)
+            print(f"choice done {choice}")
 
         bfsResults = [self.__bfsD__(i) for i in choices]
+        print("bfsResults calculado")
         maxlevels = [max(levels) for levels in bfsResults]
-
-        with open('diametro.txt', 'w') as f:
-            f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
-
-    def diametro_txt(self, filename):
-        # Calculates the diameter of a graph by choosing k=log_2 n vertices from a txt file
-        # that contains the time required to perform a bfs in 1000 vertices, and performing
-        # bfs in these vertices.
-        # Here we are supposing that the diameter can be found performing some bfs
-        # in the vertices that took longer to do the bfs when creating the txt file.
-        k = math.floor(math.log2(self.n))
-        df0 = pd.read_csv(filename, sep=' ')
-        df0.sort_values('time', ascending=False, inplace=True, ignore_index=True)
-        btv = df0.iloc[:k]['vertice'] # Biggest time vertices
-
-        bfsResults = [self.__bfsD__(i) for i in btv]
-        maxlevels = [max(levels) for levels in bfsResults]
+        print(maxlevels)
+        print("maxlevels calculado")
 
         with open('diametro.txt', 'w') as f:
             f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
