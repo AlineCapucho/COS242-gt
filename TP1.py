@@ -294,7 +294,6 @@ class Graph:
         # Determines the diameter of a given graph by calculating the diameter in the
         # biggest connected component
         if (self.n > 1000):
-            print("Indo para diametro2")
             self.diametro2()
         else:
             conexos_list = self.conexos()
@@ -321,13 +320,10 @@ class Graph:
             while (choice in choices):
                 choice = random.randint(1, self.n)
             choices.append(choice)
-            print(f"choice done {choice}")
 
         bfsResults = [self.__bfsD__(i) for i in choices]
-        print("bfsResults calculado")
         maxlevels = [max(levels) for levels in bfsResults]
         print(maxlevels)
-        print("maxlevels calculado")
 
         with open('diametro.txt', 'w') as f:
             f.write("O diâmetro máximo do grafo é {}".format(max(maxlevels)) + '\n')
