@@ -40,17 +40,17 @@ import pandas as pd
 # mygraph.create_from_file('grafo_1.txt', kind='list')
 
 # Os tempos de execução das dfs foram calculados para diferentes vértices e armazenados em um txt
-# A forma como fizemos isso está exemplificada no código a seguir. No caso de grafos com pelo
-# menos 1000 vértices, não foi necessário calcular o mod do número do vértice que a dfs será
-# realizada.
-# with open('dfstimersgrafo1.txt', 'a') as f:
+# A forma como fizemos isso está exemplificada no código a seguir.
+# No caso do grafo 2 que possui perto de 1000 vértice, fomos até onde possível e recomeçamos até
+# completar 1000 bfs realizadas.
+# with open('dfstimersgrafo1list.txt', 'a') as f:
 #     for i in range(1, 1000+1):
 #         # A linha abaixo é para quando o grafo tem pelo menos 1000 vértices
 #         v = i
-#         # As três linhas abaixo são para quando o grafo tem menos de 1000 vértices
-#         # v = i % 100
-#         # if (v == 0):
-#         #     v = 100
+#         # As três linhas abaixo são para o grafo 1
+#         v = i % 100
+#         if (v == 0):
+#             v = 100
 #         startTime = time.time()
 #         mygraph.dfs(v)
 #         executionTime = time.time() - startTime
@@ -96,35 +96,39 @@ import pandas as pd
 
 """ Estudo de Casos Pergunta 7 """
 # mygraph = Graph()
-# mygraph.create_from_file("grafo_2.txt", kind='list')
+# mygraph.create_from_file("grafo_6.txt", kind='list')
 # mygraph.diametro()
 
 """ Calculando a média """
 # O código a seguir pode ser facilmente modificado para calcular o tempo médio de uma busca
 # para diferentes arquivos de tempo.
-# df0 = pd.read_csv('bfstimersgrafo5matrix.txt', sep=' ')
+# df0 = pd.read_csv('dfstimersgrafo6list.txt', sep=' ')
 # mean = df0['time'].mean()
-# print(f"O tempo médio de uma BFS é {mean} segundos")
+# print(f"O tempo médio de uma DFS é {mean} segundos")
 
 """ Gerando os gráficos """
 
 # fig, ax = plt.subplots()
 
-# df0 = pd.read_csv('bfstimersgrafo6.txt', sep=' ')
+# df0 = pd.read_csv('bfstimersgrafo1.txt', sep=' ')
+# print(df0)
 
-# # df0['time'] = df0['time'] * 1000
+# # Essa linha é usada quando deseja-se o tempo em milisegundos
+# df0['time'] = df0['time'] * 1000
 
-# ax.scatter(df0['vertice'], df0['time'], c=df0.index)
+# ax.scatter(df0['vertice'], df0['time'], c=df0['vertice'], alpha=0.5)
 # # ax.hist(df0['time'], bins=30)
 
 # ax.set_title('Time required for the BFS in each vertice')
 # ax.set_xlabel('Vertice')
-# ax.set_ylabel('Time required (s)')
+# ax.set_ylabel('Time required (ms)') # Alterne entre s ou ms dependendo do que desejar
 # ax.tick_params(which='minor', width=0.75, length=2.5)
 # # ax.set_xlim(0, 1000)
 # # ax.set_yticks(np.arange(0, 7, 0.5))
 # fig.set_size_inches([8, 6])
 
 # plt.show()
+
+# fig.savefig('TimePerVertice G1L.png', dpi=300)
 
 ### TAIL ###
