@@ -10,6 +10,7 @@ import numpy as np
 #### Utilities ####
 
 def get_line(filename, line):
+    # Gets the line with index "line" from a file. Index start at 0
     with open(filename, 'r') as f:
         line = next(iter.islice(f, line, line+1), None)
         return line
@@ -29,7 +30,7 @@ class Digraph:
         self.grausToV = 0
         self.n = 0
         self.m = 0
-        self.weighted = 0
+        self.weighted = 0 # 0 if the digraph doesn not have weights, 1 otherwise
     
     def create_from_file(self, filename, kind='list'):
         # This function must create a graph by reading a file
@@ -48,6 +49,8 @@ class Digraph:
                 for i in range(1, n+1):
                     self.vertices = np.append(self.vertices, Vertice(i))
 
+                # We check if the digraph we are reading has weights by checking if it
+                # has a third column
                 columns = get_line(filename, 2).split()
                 if len(columns) < 3:
                     for line in f.readlines():
@@ -83,6 +86,8 @@ class Digraph:
                 self.matrix = np.zeros((n, n))
                 self.matrix_weights = np.zeros((n, n))
 
+                # We check if the digraph we are reading has weights by checking if it
+                # has a third column
                 columns = get_line(filename, 2).split()
                 if len(columns) < 3:
                     for line in f.readlines():
