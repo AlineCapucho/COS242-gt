@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 from collections import deque
+import itertools as iter
 import random
 import math
 import copy
 import time
 import numpy as np
 
-#### Numpy Interface ####
+#### Utilities ####
+
+def get_line(filename, line):
+    with open(filename, 'r') as f:
+        line = next(iter.islice(f, line, line+1), None)
+        return line
 
 #### Actual Code ####
 
@@ -17,11 +23,13 @@ class Digraph:
         # chose between adjacency list or matrix
         self.vertices = np.array([])
         self.matrix = np.array([], dtype=np.int32)
+        self.matrix_weights = np.array([], dtype=np.float32)
         self.kind = ''
         self.grausFromV = 0
         self.grausToV = 0
         self.n = 0
         self.m = 0
+        self.weighted = 0
     
     def create_from_file(self, filename, kind='list'):
         # This function must create a graph by reading a file
@@ -39,38 +47,72 @@ class Digraph:
                 self.kind = 'list'
                 for i in range(1, n+1):
                     self.vertices = np.append(self.vertices, Vertice(i))
+
+                columns = get_line(filename, 2).split()
+                if len(columns) < 3:
+                    for line in f.readlines():
+                        self.m += 1
+
+                        numbers = line.split()
+                        u = int(numbers[0])
+                        v = int(numbers[1])
+
+                        self.vertices[u-1].fromV = np.append(self.vertices[u-1].fromV, v)
+                        self.grausFromV[u-1] += 1
+                        self.grausToV[v-1] += 1
                 
-                for line in f.readlines():
-                    self.m += 1
+                else:
+                    self.weighted = 1
+                    for line in f.readlines():
+                        self.m += 1
 
-                    numbers = line.split()
-                    u = int(numbers[0])
-                    v = int(numbers[1])
+                        numbers = line.split()
+                        u = int(numbers[0])
+                        v = int(numbers[1])
+                        w = float(numbers[2])
 
-                    self.vertices[u-1].fromV = np.append(self.vertices[u-1].fromV, v)
-                    self.grausFromV[u-1] += 1
-
-                    self.vertices[v-1].toV = np.append(self.vertices[u-1].fromV, u)
-                    self.grausToV[v-1] += 1
+                        self.vertices[u-1].fromV = np.append(self.vertices[u-1].fromV, v)
+                        self.vertices[u-1].weights = np.append(self.vertices[u-1].weights, w)
+                        self.grausFromV[u-1] += 1
+                        self.grausToV[v-1] += 1
             elif kind == 'matrix':
                 # If the choice is adjacency matrix, then the field matrix will be initialize
                 # and store the edges that come from or go to some vertice by setting the
                 # value 1 to "vertice from" or the value 2 to "vertice to"
                 self.kind = 'matrix'
                 self.matrix = np.zeros((n, n))
+                self.matrix_weights = np.zeros((n, n))
 
-                for line in f.readlines():
-                    self.m += 1
+                columns = get_line(filename, 2).split()
+                if len(columns) < 3:
+                    for line in f.readlines():
+                        self.m += 1
 
-                    numbers = line.split()
-                    u = int(numbers[0])
-                    v = int(numbers[1])
+                        numbers = line.split()
+                        u = int(numbers[0])
+                        v = int(numbers[1])
 
-                    self.matrix[u-1,v-1] = 1
-                    self.grausFromV[u-1] += 1
+                        self.matrix[u-1,v-1] = 1
+                        self.grausFromV[u-1] += 1
 
-                    self.matrix[v-1,u-1] = 2
-                    self.grausToV[v-1] += 1
+                        self.matrix[v-1,u-1] = 2
+                        self.grausToV[v-1] += 1
+                else:
+                    self.weighted = 1
+                    for line in f.readlines():
+                        self.m += 1
+
+                        numbers = line.split()
+                        u = int(numbers[0])
+                        v = int(numbers[1])
+                        w = float(numbers[2])
+
+                        self.matrix[u-1,v-1] = 1
+                        self.grausFromV[u-1] += 1
+                        self.matrix_weights[u-1,v-1] = w
+
+                        self.matrix[v-1,u-1] = 2
+                        self.grausToV[v-1] += 1
             else:
                 raise Exception('Invalid kind.')
     
@@ -203,16 +245,16 @@ class Digraph:
 class Vertice:
     def __init__(self, id):
         # Creates a vertice where id is the identifier, fromV contains the edges
-        # that comes from this Vertice and toV contains the edges that goes to
-        # this vertice
+        # that comes from this Vertice and weighs contains the weight of each
+        # edges that comes from this Vertice
         self.id = id
         self.fromV = np.array([], dtype=np.int32)
-        self.toV = np.array([], dtype=np.int32)
+        self.weights = np.array([], dtype=np.int32)
 
 #### Testing ####
 
 mygraph = Digraph()
-mygraph.create_from_file('test.txt', kind='matrix')
+mygraph.create_from_file('test.txt', kind='list')
 mygraph.dfs(1)
 print(mygraph)
 
