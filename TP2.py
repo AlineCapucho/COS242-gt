@@ -255,6 +255,8 @@ class Digraph:
             raise Exception('This graph was not initialized')
 
     def dijkstra(self, s):
+        if self.negative == 1:
+            raise Exception('Dijkstra cannot be used in graphs with negative weights')
         if self.kind == 'list':
             dist = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
             V = np.arange(self.n, dtype=np.uint32)
