@@ -23,14 +23,15 @@ class Digraph:
         # The fields vertices or matrix will be used depending on whether the user
         # chose between adjacency list or matrix
         self.vertices = np.array([])
-        self.matrix = np.array([], dtype=np.int32)
+        self.matrix = np.array([], dtype=np.uint32)
         self.matrix_weights = np.array([], dtype=np.float32)
         self.kind = ''
         self.grausFromV = 0
         self.grausToV = 0
         self.n = 0
         self.m = 0
-        self.weighted = 0 # 0 if the digraph doesn not have weights, 1 otherwise
+        self.weighted = 0 # 0 if the digraph does not have weights, 1 otherwise
+        self.negative = 0 # 0 if the digraph does not have negative weights, 1 otherwise
     
     def create_from_file(self, filename, kind='list'):
         # This function must create a graph by reading a file
@@ -73,6 +74,9 @@ class Digraph:
                         u = int(numbers[0])
                         v = int(numbers[1])
                         w = float(numbers[2])
+                        
+                        if w < 0:
+                            self.negative = 1
 
                         self.vertices[u-1].fromV = np.append(self.vertices[u-1].fromV, v)
                         self.vertices[u-1].weights = np.append(self.vertices[u-1].weights, w)
@@ -111,6 +115,9 @@ class Digraph:
                         u = int(numbers[0])
                         v = int(numbers[1])
                         w = float(numbers[2])
+
+                        if w < 0:
+                            self.negative = 1
 
                         self.matrix[u-1,v-1] = 1
                         self.grausFromV[u-1] += 1
@@ -247,20 +254,44 @@ class Digraph:
         else:
             raise Exception('This graph was not initialized')
 
+    def dijkstra(self, s):
+        if self.kind == 'list':
+            dist = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            V = np.arange(self.n, dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            dist[s-1] = 0
+            
+            while np.array_equal(V, S) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                print(diff)
+                dist_min = dist[diff].min()
+                idx = np.where(dist==dist_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                for i in range(self.vertices[u].fromV.size):
+                    w = self.vertices[u].fromV[i]
+                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+            
+            return dist
+        elif self.kind == 'matrix':
+            dist = np.full(self.n, np.inf)
+        else:
+            raise Exception('This graph was not initialized')
+
 class Vertice:
     def __init__(self, id):
         # Creates a vertice where id is the identifier, fromV contains the edges
         # that comes from this Vertice and weighs contains the weight of each
         # edges that comes from this Vertice
         self.id = id
-        self.fromV = np.array([], dtype=np.int32)
-        self.weights = np.array([], dtype=np.int32)
+        self.fromV = np.array([], dtype=np.uint32)
+        self.weights = np.array([], dtype=np.uint32)
 
 #### Testing ####
 
 mygraph = Digraph()
-mygraph.create_from_file('test.txt', kind='list')
-mygraph.dfs(1)
-print(mygraph)
+mygraph.create_from_file('testdigraph.txt', kind='list')
+print(mygraph.dijkstra(1))
 
 #### TAIL ####
