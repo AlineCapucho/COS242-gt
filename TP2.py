@@ -255,6 +255,8 @@ class Digraph:
             raise Exception('This graph was not initialized')
 
     def dijkstra(self, s):
+        if self.weighted == 0:
+            raise Exception('Dijkstra is not to be used in graphs without weights')
         if self.negative == 1:
             raise Exception('Dijkstra cannot be used in graphs with negative weights')
         if self.kind == 'list':
