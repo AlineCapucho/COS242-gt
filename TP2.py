@@ -298,6 +298,50 @@ class Digraph:
         else:
             raise Exception('This graph was not initialized')
 
+    def prim(self, s):
+        if self.weighted == 0:
+            raise Exception('Prim is not to be used in graphs without weights')
+        if self.negative == 1:
+            raise Exception('Prim cannot be used in graphs with negative weights')
+        if self.kind == 'list':
+            cost = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            V = np.arange(self.n, dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            cost[s-1] = 0
+            
+            while np.array_equal(V, S) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                cost_min = cost[diff].min()
+                idx = np.where(cost==cost_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                for i in range(self.vertices[u].fromV.size):
+                    w = self.vertices[u].fromV[i]
+                    if cost[w-1] > self.vertices[u].weights[i]:
+                        cost[w-1] = self.vertices[u].weights[i]
+            
+            return cost
+        elif self.kind == 'matrix':
+            cost = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            V = np.arange(self.n, dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            cost[s-1] = 0
+
+            while np.array_equal(V, S) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                cost_min = cost[diff].min()
+                idx = np.where(cost==cost_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                for w in range(self.n):
+                    if self.matrix[u, w] == 1:
+                        if cost[w] > self.matrix_weights[u, w]:
+                            cost[w] = self.matrix_weights[u, w]
+            
+            return cost
+        else:
+            raise Exception('This graph was not initialized')
+
 class Vertice:
     def __init__(self, id):
         # Creates a vertice where id is the identifier, fromV contains the edges
@@ -311,6 +355,6 @@ class Vertice:
 
 mygraph = Digraph()
 mygraph.create_from_file('testdigraph.txt', kind='matrix')
-print(mygraph.dijkstra(1))
+print(mygraph.prim(1))
 
 #### TAIL ####
