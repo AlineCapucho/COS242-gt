@@ -85,7 +85,7 @@ class Digraph:
             elif kind == 'matrix':
                 # If the choice is adjacency matrix, then the field matrix will be initialize
                 # and store the edges that come from or go to some vertice by setting the
-                # value 1 to "vertice from" or the value 2 to "vertice to"
+                # value 1 to "edge from" or the value 2 to "edge to"
                 self.kind = 'matrix'
                 self.matrix = np.zeros((n, n))
                 self.matrix_weights = np.zeros((n, n))
@@ -265,7 +265,6 @@ class Digraph:
             
             while np.array_equal(V, S) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
-                print(diff)
                 dist_min = dist[diff].min()
                 idx = np.where(dist==dist_min)
                 u = np.intersect1d(idx[0], diff)[0]
@@ -277,7 +276,23 @@ class Digraph:
             
             return dist
         elif self.kind == 'matrix':
-            dist = np.full(self.n, np.inf)
+            dist = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            V = np.arange(self.n, dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            dist[s-1] = 0
+
+            while np.array_equal(V, S) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                dist_min = dist[diff].min()
+                idx = np.where(dist==dist_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                for w in range(self.n):
+                    if self.matrix[u, w] == 1:
+                        if dist[w] > dist[u] + self.matrix_weights[u, w]:
+                            dist[w] = dist[u] + self.matrix_weights[u, w]
+            
+            return dist
         else:
             raise Exception('This graph was not initialized')
 
@@ -293,7 +308,7 @@ class Vertice:
 #### Testing ####
 
 mygraph = Digraph()
-mygraph.create_from_file('testdigraph.txt', kind='list')
+mygraph.create_from_file('testdigraph.txt', kind='matrix')
 print(mygraph.dijkstra(1))
 
 #### TAIL ####
