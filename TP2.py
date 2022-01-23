@@ -362,7 +362,6 @@ class Digraph:
                 f.write(f'Vertice | Parent\n')
                 for v in self.vertices:
                     f.write(f'{v.id} | {parents[v.id-1]}\n')
-            return cost
         elif self.kind == 'matrix':
             cost = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
@@ -395,7 +394,6 @@ class Digraph:
                 f.write(f'Vertice | Parent\n')
                 for v in self.vertices:
                     f.write(f'{v.id} | {parents[v.id-1]}\n')
-            return cost
         else:
             raise Exception('This graph was not initialized')
 
@@ -412,6 +410,5 @@ class Vertice:
 
 mygraph = Digraph()
 mygraph.create_from_file('testdigraph.txt', kind='list')
-print(mygraph.prim(3))
 
 #### TAIL ####
