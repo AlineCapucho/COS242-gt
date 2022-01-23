@@ -260,41 +260,68 @@ class Digraph:
         if self.negative == 1:
             raise Exception('Dijkstra cannot be used in graphs with negative weights')
         if self.kind == 'list':
-            dist = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            dist = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
             S = np.array([], dtype=np.uint32)
             dist[s-1] = 0
+
+            parents = np.full(self.n, -1)
+            levels = np.full(self.n, -1)
+            levels[s-1] = 0
             
-            while np.array_equal(V, S) != True:
+            while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
                 dist_min = dist[diff].min()
+                if dist_min == np.inf:
+                    break
                 idx = np.where(dist==dist_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
                 for i in range(self.vertices[u].fromV.size):
                     w = self.vertices[u].fromV[i]
+                    if w not in S:
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
                     if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
                         dist[w-1] = dist[u] + self.vertices[u].weights[i]
             
-            return dist
+            with open('dijkstra.txt', 'w') as f:
+                f.write(f'Resultado de Dijsktra feito no vértice {u}:\n')
+                f.write(f'Vertice | Parent | Level\n')
+                for v in self.vertices:
+                    f.write(f'{v.id} | {parents[v.id-1]} | {levels[v.id-1]}\n')
         elif self.kind == 'matrix':
-            dist = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            dist = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
             S = np.array([], dtype=np.uint32)
             dist[s-1] = 0
 
-            while np.array_equal(V, S) != True:
+            parents = np.full(self.n, -1)
+            levels = np.full(self.n, -1)
+            levels[s-1] = 0
+
+            while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
                 dist_min = dist[diff].min()
+                print(dist_min)
+                if dist_min == np.inf:
+                    break
                 idx = np.where(dist==dist_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
                 for w in range(self.n):
                     if self.matrix[u, w] == 1:
+                        if w not in S:
+                            parents[w] = u+1
+                            levels[w] = levels[u]+1
                         if dist[w] > dist[u] + self.matrix_weights[u, w]:
                             dist[w] = dist[u] + self.matrix_weights[u, w]
             
-            return dist
+            with open('dijkstra.txt', 'w') as f:
+                f.write(f'Resultado de Dijsktra feito no vértice {u}:\n')
+                f.write(f'Vertice | Parent | Level\n')
+                for v in range(1, self.n+1):
+                    f.write(f'{v} | {parents[v-1]} | {levels[v-1]}\n')
         else:
             raise Exception('This graph was not initialized')
 
@@ -304,40 +331,70 @@ class Digraph:
         if self.negative == 1:
             raise Exception('Prim cannot be used in graphs with negative weights')
         if self.kind == 'list':
-            cost = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            cost = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
             S = np.array([], dtype=np.uint32)
             cost[s-1] = 0
+
+            parents = np.full(self.n, -1)
+            levels = np.full(self.n, -1)
+            levels[s-1] = 0
             
-            while np.array_equal(V, S) != True:
+            while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
                 cost_min = cost[diff].min()
+                if cost_min == np.inf:
+                    break
                 idx = np.where(cost==cost_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
                 for i in range(self.vertices[u].fromV.size):
                     w = self.vertices[u].fromV[i]
+                    if w not in S:
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
                     if cost[w-1] > self.vertices[u].weights[i]:
                         cost[w-1] = self.vertices[u].weights[i]
             
+            with open('prim.txt', 'w') as f:
+                f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
+                f.write(f'com peso total {cost.sum()}:\n')
+                f.write(f'Vertice | Parent\n')
+                for v in self.vertices:
+                    f.write(f'{v.id} | {parents[v.id-1]}\n')
             return cost
         elif self.kind == 'matrix':
-            cost = np.full(self.n, np.iinfo(np.uint32).max, dtype=np.uint32)
+            cost = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
             S = np.array([], dtype=np.uint32)
             cost[s-1] = 0
 
-            while np.array_equal(V, S) != True:
+            parents = np.full(self.n, -1)
+            levels = np.full(self.n, -1)
+            levels[s-1] = 0
+
+            while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
                 cost_min = cost[diff].min()
+                if cost_min == np.inf:
+                    break
                 idx = np.where(cost==cost_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
                 for w in range(self.n):
                     if self.matrix[u, w] == 1:
+                        if w not in S:
+                            parents[w] = u+1
+                            levels[w] = levels[u]+1
                         if cost[w] > self.matrix_weights[u, w]:
                             cost[w] = self.matrix_weights[u, w]
             
+            with open('prim.txt', 'w') as f:
+                f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
+                f.write(f'com peso total {cost.sum()}:\n')
+                f.write(f'Vertice | Parent\n')
+                for v in self.vertices:
+                    f.write(f'{v.id} | {parents[v.id-1]}\n')
             return cost
         else:
             raise Exception('This graph was not initialized')
@@ -354,7 +411,7 @@ class Vertice:
 #### Testing ####
 
 mygraph = Digraph()
-mygraph.create_from_file('testdigraph.txt', kind='matrix')
-print(mygraph.prim(1))
+mygraph.create_from_file('testdigraph.txt', kind='list')
+print(mygraph.prim(3))
 
 #### TAIL ####
