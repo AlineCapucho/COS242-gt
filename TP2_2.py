@@ -157,10 +157,12 @@ class Graph:
                         self.matrix[u-1][v-1] = 1
                         self.graus[u-1] += 1
                         self.matrix_weights[u-1][v-1] = w
+                        print(u, v, self.matrix_weights[u-1][v-1])
 
                         self.matrix[v-1][u-1] = 1
                         self.graus[v-1] += 1
                         self.matrix_weights[v-1][u-1] = w
+                        print(v, u, self.matrix_weights[v-1][u-1])
 
             else:
                 raise Exception('Invalid kind.')
