@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import deque
 import itertools as iter
+import numpy as np
 import random
 import math
 
@@ -359,6 +360,51 @@ class Graph:
         else:
             raise Exception('Invalid graph, must be weigthless.')
 
+    def dijkstra(self, s):
+        if self.weighted == 0:
+            raise Exception('Dijkstra is not to be used in graphs without weights')
+        if self.negative == 1:
+            raise Exception('Dijkstra cannot be used in graphs with negative weights')
+        if self.kind == 'list':
+            dist = np.full(len(self.vertices), np.inf, dtype=np.float32)
+            V = np.arange(len(self.vertices), dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            dist[s-1] = 0
+
+            parents = np.full(len(self.vertices), -1)
+            levels = np.full(len(self.vertices), -1)
+            levels[s-1] = 0
+            
+            while np.array_equal(V, np.sort(S)) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                dist_min = dist[diff].min()
+                if dist_min == np.inf:
+                    break
+                idx = np.where(dist==dist_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                # para cada vizinho v de u
+                for i in range(0, len(self.vertices[u].vizinhos), 1):
+                    w = self.vertices[u].vizinhos[i]
+                    print(u, w)
+                    print(S)
+                    if w not in S:
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
+                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+            
+            with open('dijkstra.txt', 'w') as f:
+                f.write('Resultado de Dijsktra feito no vértice {}:\n'.format(s))
+                # f.write('Vertice | Parent | Level\n')
+                # for v in self.vertices:
+                #     f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
+                f.write('Vertice | Distance | Path\n')
+                for v in self.vertices:
+                    f.write('{} | {} | {}\n'.format(v.id, dist[v.id-1], path[v.id-1]))
+        else:
+            raise Exception('This graph was not initialized')
+
     def distancia(self, v1, v2):
         # Determines the distance between two vertices
         bfsResult = self.__bfsD__(v1)
@@ -609,8 +655,8 @@ class Vertice:
 #### Testing ####
 
 mygraph = Graph()
-mygraph.create_from_file('testidgraph.txt', kind='list')
+mygraph.create_from_file('test.txt', kind='matrix')
 
-print(mygraph)
+print(mygraph.dijkstra(1))
 
 #### TAIL ####
