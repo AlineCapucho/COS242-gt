@@ -17,7 +17,7 @@ def get_line(filename, line):
 
 class Graph:
     def __init__(self):
-        # Initially, just initialize the deque and does nothing more
+        """Initializes the deques and object variables"""
         self.vertices = []
         self.matrix = []
         self.matrix_weights =[]
@@ -29,7 +29,7 @@ class Graph:
         self.negative = 0 # 0 if the graph does not have negative weights, 1 otherwise
 
     def create(self, v, e, kind='list'):
-        # This function must create the graph (weightless)
+        """Creates a weightless graph"""
         if kind == 'list':
             self.kind = 'list'
             for i in range(1, v+1):
@@ -65,8 +65,7 @@ class Graph:
             raise Exception('Invalid kind.')
     
     def create_from_file(self, filename, kind='list'):
-        # This function must create a graph by reading a file
-        
+        """Creates a graph by reading a file"""
         with open(filename, 'r') as f:
             # Gets the number of vertices, sets it in the object then initializes
             # the graus fields
@@ -169,7 +168,7 @@ class Graph:
                 raise Exception('Invalid kind.')
     
     def __repr__(self):
-        # Creates a print representation to visualize the contents
+        """Creates a print representation to visualize the contents"""
         if self.kind == 'list':
             vertices = 'number of vertices: {}'.format(str(len(self.vertices)))
             edges = ''
@@ -208,8 +207,9 @@ class Graph:
             raise Exception('This graph was not initialized')
 
     def bfs(self, b):
+        """Makes a breadth-first search on a weightless graph using b as the root.
+        No return, creates a bfs.text file with the parent and level of each vertice"""
         if(self.weighted == 0):
-            # Makes a breadth-first search on the graph using b as the root
             if self.kind == 'list':
                 self.bfsMarks = []
                 self.bfsPai = []
@@ -283,9 +283,113 @@ class Graph:
         else:
             raise Exception('Invalid graph, must be weigthless.')
 
-    def dfs(self, b):
+    def __bfsConexos__(self, b):
+        """Makes a breadth-first search on a weightless graph using b as the root.
+        Returns a list with all the marked vertices in that search"""
         if(self.weighted == 0):
-            # Makes a depth-first search on the graph using b as the root
+            if self.kind == 'list':
+                self.bfsMarks = []
+                self.bfsQueue = deque()
+
+                for i in range(len(self.vertices)):
+                    self.bfsMarks.append(0)
+                self.bfsMarks[b-1] = 1
+                self.bfsQueue.append(b)
+
+                while(self.bfsQueue):
+                    v = self.bfsQueue.popleft()
+                    vizinhos = self.vertices[v-1].vizinhos
+
+                    for i in range (len(vizinhos)):
+                        if self.bfsMarks[vizinhos[i]-1] == 0:
+                            self.bfsMarks[vizinhos[i]-1] = 1
+                            self.bfsQueue.append(vizinhos[i])
+
+                return self.bfsMarks
+
+            elif self.kind == 'matrix':
+                self.bfsMarks = []
+                self.bfsQueue = deque()
+
+                for i in range(len(self.matrix[0])):
+                    self.bfsMarks.append(0)
+                self.bfsMarks[b-1] = 1
+                self.bfsQueue.append(b)
+
+                while(self.bfsQueue):
+                    v = self.bfsQueue.popleft()
+                    for i in range(len(self.matrix[0])):
+                        if self.matrix[v-1][i] == 1:
+                            if self.bfsMarks[i] == 0:
+                                self.bfsMarks[i] = 1
+                                self.bfsQueue.append(i+1)
+                
+                return self.bfsMarks
+        else:
+            raise Exception('Invalid graph, must be weigthless.')
+    
+    def __bfsD__(self, b):
+        """Makes a breadth-first search on a weightless graph using b as the root.
+        Returns a list with the levels of each verticle"""
+        if(self.weighted == 0):
+            if self.kind == 'list':
+                self.bfsMarks = []
+                self.bfsPai = []
+                self.bfsLevel = []
+                self.bfsQueue = deque()
+
+                for i in range(len(self.vertices)):
+                    self.bfsMarks.append(0)
+                    self.bfsPai.append(-1)
+                    self.bfsLevel.append(-1)
+                self.bfsMarks[b-1] = 1
+                self.bfsLevel[b-1] = 0
+                self.bfsQueue.append(b)
+
+                while(self.bfsQueue):
+                    v = self.bfsQueue.popleft()
+                    vizinhos = self.vertices[v-1].vizinhos
+
+                    for i in range (len(vizinhos)):
+                        if self.bfsMarks[vizinhos[i]-1] == 0:
+                            self.bfsMarks[vizinhos[i]-1] = 1
+                            self.bfsQueue.append(vizinhos[i])
+                            self.bfsPai[vizinhos[i]-1] = v
+                            self.bfsLevel[vizinhos[i] - 1] = self.bfsLevel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
+
+                return self.bfsLevel
+            elif self.kind == 'matrix':
+                self.bfsMarks = []
+                self.bfsPai = []
+                self.bfsLevel = []
+                self.bfsQueue = deque()
+
+                for i in range(len(self.matrix[0])):
+                    self.bfsMarks.append(0)
+                    self.bfsPai.append(-1)
+                    self.bfsLevel.append(-1)
+                self.bfsMarks[b-1] = 1
+                self.bfsLevel[b-1] = 0
+                self.bfsQueue.append(b)
+
+                while(self.bfsQueue):
+                    v = self.bfsQueue.popleft()
+                    for i in range(len(self.matrix[0])):
+                        if self.matrix[v-1][i] == 1:
+                            if self.bfsMarks[i] == 0:
+                                self.bfsMarks[i] = 1
+                                self.bfsQueue.append(i+1)
+                                self.bfsPai[i] = v
+                                self.bfsLevel[i] = self.bfsLevel[self.bfsPai[i] - 1] + 1
+                
+                return self.bfsLevel
+        else:
+            raise Exception('Invalid graph, must be weigthless.')
+
+    def dfs(self, b):
+        """Makes a depth-first search on a weightless graph using b as the root.
+        No return, creates a dfs.text file with the parent and level of each vertice"""
+        if(self.weighted == 0):
             if self.kind == 'list':
                 self.dfsMarks = []
                 self.dfsPai = []
@@ -360,7 +464,21 @@ class Graph:
         else:
             raise Exception('Invalid graph, must be weigthless.')
 
-    def dijkstra(self, s):
+    def dijkstra(self, v1, v2):
+        """Runs dijkstra on positively-weighted graph from v1 to v2
+        Returns the distance and minimum path between v1 and v2"""
+        if self.weighted == 0:
+            raise Exception('Dijkstra is not to be used in graphs without weights')
+        if self.negative == 1:
+            raise Exception('Dijkstra cannot be used in graphs with negative weights')
+        if self.kind == 'list':
+            print("dijkstra between two vertices")
+        else:
+            raise Exception('This graph was not initialized')
+
+    def dijkstraAll(self, s):
+        """Runs dijkstra on positively-weighted graph using s as the root.
+        Returns the distance and minimum path between s and all other vertices"""
         if self.weighted == 0:
             raise Exception('Dijkstra is not to be used in graphs without weights')
         if self.negative == 1:
@@ -406,7 +524,7 @@ class Graph:
             raise Exception('This graph was not initialized')
 
     def distancia(self, v1, v2):
-        # Determines the distance between two vertices
+        """"Determines the distance between vertices v1 and v2"""
         bfsResult = self.__bfsD__(v1)
         level = bfsResult
 
@@ -462,8 +580,8 @@ class Graph:
             raise Exception('Invalid graph, must be weigthless.')
 
     def conexos(self):
+        """Determines the connected components of a weightless graph"""
         if(self.weighted == 0):
-            # Determines the connected components of a given graph
             if(self.kind == 'list'):
                 aux = 1
                 marked = []
@@ -497,102 +615,6 @@ class Graph:
                 return marked
         else:
             raise Exception('Invalid graph, must be weigthless.')
-
-    def __bfsConexos__(self, b):
-        #  Makes a breadth-first search on the graph using b as the root
-        # returns a list with all the marked vertices in that search
-        if self.kind == 'list':
-            self.bfsMarks = []
-            self.bfsQueue = deque()
-
-            for i in range(len(self.vertices)):
-                self.bfsMarks.append(0)
-            self.bfsMarks[b-1] = 1
-            self.bfsQueue.append(b)
-
-            while(self.bfsQueue):
-                v = self.bfsQueue.popleft()
-                vizinhos = self.vertices[v-1].vizinhos
-
-                for i in range (len(vizinhos)):
-                    if self.bfsMarks[vizinhos[i]-1] == 0:
-                        self.bfsMarks[vizinhos[i]-1] = 1
-                        self.bfsQueue.append(vizinhos[i])
-
-            return self.bfsMarks
-
-        elif self.kind == 'matrix':
-            self.bfsMarks = []
-            self.bfsQueue = deque()
-
-            for i in range(len(self.matrix[0])):
-                self.bfsMarks.append(0)
-            self.bfsMarks[b-1] = 1
-            self.bfsQueue.append(b)
-
-            while(self.bfsQueue):
-                v = self.bfsQueue.popleft()
-                for i in range(len(self.matrix[0])):
-                    if self.matrix[v-1][i] == 1:
-                        if self.bfsMarks[i] == 0:
-                            self.bfsMarks[i] = 1
-                            self.bfsQueue.append(i+1)
-            
-            return self.bfsMarks
-
-    def __bfsD__(self, b):
-        if self.kind == 'list':
-            self.bfsMarks = []
-            self.bfsPai = []
-            self.bfsLevel = []
-            self.bfsQueue = deque()
-
-            for i in range(len(self.vertices)):
-                self.bfsMarks.append(0)
-                self.bfsPai.append(-1)
-                self.bfsLevel.append(-1)
-            self.bfsMarks[b-1] = 1
-            self.bfsLevel[b-1] = 0
-            self.bfsQueue.append(b)
-
-            while(self.bfsQueue):
-                v = self.bfsQueue.popleft()
-                vizinhos = self.vertices[v-1].vizinhos
-
-                for i in range (len(vizinhos)):
-                    if self.bfsMarks[vizinhos[i]-1] == 0:
-                        self.bfsMarks[vizinhos[i]-1] = 1
-                        self.bfsQueue.append(vizinhos[i])
-                        self.bfsPai[vizinhos[i]-1] = v
-                        self.bfsLevel[vizinhos[i] - 1] = self.bfsLevel[self.bfsPai[vizinhos[i] - 1] - 1] + 1
-
-            return self.bfsLevel
-
-        elif self.kind == 'matrix':
-            self.bfsMarks = []
-            self.bfsPai = []
-            self.bfsLevel = []
-            self.bfsQueue = deque()
-
-            for i in range(len(self.matrix[0])):
-                self.bfsMarks.append(0)
-                self.bfsPai.append(-1)
-                self.bfsLevel.append(-1)
-            self.bfsMarks[b-1] = 1
-            self.bfsLevel[b-1] = 0
-            self.bfsQueue.append(b)
-
-            while(self.bfsQueue):
-                v = self.bfsQueue.popleft()
-                for i in range(len(self.matrix[0])):
-                    if self.matrix[v-1][i] == 1:
-                        if self.bfsMarks[i] == 0:
-                            self.bfsMarks[i] = 1
-                            self.bfsQueue.append(i+1)
-                            self.bfsPai[i] = v
-                            self.bfsLevel[i] = self.bfsLevel[self.bfsPai[i] - 1] + 1
-            
-            return self.bfsLevel
 
     def info(self, filename):
         # This functions write in a file named filename information about the graph
@@ -643,6 +665,46 @@ class Graph:
         else:
             raise Exception('Invalid kind.')
 
+    def prim(self, s):
+        if self.weighted == 0:
+            raise Exception('Prim is not to be used in graphs without weights')
+        if self.negative == 1:
+            raise Exception('Prim cannot be used in graphs with negative weights')
+        if self.kind == 'list':
+            cost = np.full(self.n, np.inf, dtype=np.float32)
+            V = np.arange(self.n, dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            cost[s-1] = 0
+
+            parents = np.full(self.n, -1)
+            levels = np.full(self.n, -1)
+            levels[s-1] = 0
+            
+            while np.array_equal(V, np.sort(S)) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                cost_min = cost[diff].min()
+                if cost_min == np.inf:
+                    break
+                idx = np.where(cost==cost_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                for i in range(self.vertices[u].fromV.size):
+                    w = self.vertices[u].fromV[i]
+                    if w not in S:
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
+                    if cost[w-1] > self.vertices[u].weights[i]:
+                        cost[w-1] = self.vertices[u].weights[i]
+            
+            with open('prim.txt', 'w') as f:
+                f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(u))
+                f.write('com peso total {}:\n'.format(cost.sum()))
+                f.write('Vertice| Path\n')
+                for v in self.vertices:
+                    f.write('{} | {}\n'.format(v.id, parents[v.id-1]))
+        else:
+            raise Exception('This graph was not initialized')
+
 class Vertice:
     def __init__(self, id):
         # Creates a vertice where id is the identifier, fromV contains the edges
@@ -655,8 +717,8 @@ class Vertice:
 #### Testing ####
 
 mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='matrix')
+mygraph.create_from_file('test.txt', kind='list')
 
-print(mygraph.dijkstra(1))
+print(mygraph.prim(1))
 
 #### TAIL ####
