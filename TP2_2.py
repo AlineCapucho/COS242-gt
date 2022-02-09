@@ -671,13 +671,13 @@ class Graph:
         if self.negative == 1:
             raise Exception('Prim cannot be used in graphs with negative weights')
         if self.kind == 'list':
-            cost = np.full(self.n, np.inf, dtype=np.float32)
-            V = np.arange(self.n, dtype=np.uint32)
+            cost = np.full(len(self.vertices), np.inf, dtype=np.float32)
+            V = np.arange(len(self.vertices), dtype=np.uint32)
             S = np.array([], dtype=np.uint32)
             cost[s-1] = 0
 
-            parents = np.full(self.n, -1)
-            levels = np.full(self.n, -1)
+            parents = np.full(len(self.vertices), -1)
+            levels = np.full(len(self.vertices), -1)
             levels[s-1] = 0
             
             while np.array_equal(V, np.sort(S)) != True:
@@ -688,20 +688,19 @@ class Graph:
                 idx = np.where(cost==cost_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
-                for i in range(self.vertices[u].fromV.size):
-                    w = self.vertices[u].fromV[i]
-                    if w not in S:
-                        parents[w-1] = u+1
-                        levels[w-1] = levels[u]+1
+                for i in range(len(self.vertices[u].vizinhos)):
+                    w = self.vertices[u].vizinhos[i]
                     if cost[w-1] > self.vertices[u].weights[i]:
                         cost[w-1] = self.vertices[u].weights[i]
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
-                f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(u))
+                f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(s))
                 f.write('com peso total {}:\n'.format(cost.sum()))
-                f.write('Vertice| Path\n')
+                f.write('Vertice | Parent | Level\n')
                 for v in self.vertices:
-                    f.write('{} | {}\n'.format(v.id, parents[v.id-1]))
+                    f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
         else:
             raise Exception('This graph was not initialized')
 
@@ -720,5 +719,4 @@ mygraph = Graph()
 mygraph.create_from_file('test.txt', kind='list')
 
 print(mygraph.prim(1))
-
 #### TAIL ####
