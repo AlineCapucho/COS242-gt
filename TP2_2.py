@@ -114,7 +114,6 @@ class Graph:
 
                         if w < 0:
                             self.negative = 1
-
             elif kind == 'matrix':
                 # If the choice is adjacency matrix, then the field matrix will be initialize
                 self.kind = 'matrix'
@@ -142,28 +141,7 @@ class Graph:
                         self.matrix[v-1][u-1] = 1
                         self.graus[v-1] += 1
                 else:
-                    self.weighted = 1
-                    for line in f.readlines():
-                        self.m += 1
-
-                        numbers = line.split()
-                        u = int(numbers[0])
-                        v = int(numbers[1])
-                        w = float(numbers[2])
-
-                        if w < 0:
-                            self.negative = 1
-
-                        self.matrix[u-1][v-1] = 1
-                        self.graus[u-1] += 1
-                        self.matrix_weights[u-1][v-1] = w
-                        print(u, v, self.matrix_weights[u-1][v-1])
-
-                        self.matrix[v-1][u-1] = 1
-                        self.graus[v-1] += 1
-                        self.matrix_weights[v-1][u-1] = w
-                        print(v, u, self.matrix_weights[v-1][u-1])
-
+                    raise Exception('Invalid kind.')
             else:
                 raise Exception('Invalid kind.')
     
@@ -523,6 +501,73 @@ class Graph:
         else:
             raise Exception('This graph was not initialized')
 
+    def prim(self, s):
+        """Used to determined the MST of a given positively-weighted graph"""
+        if self.weighted == 0:
+            raise Exception('Prim is not to be used in graphs without weights')
+        if self.negative == 1:
+            raise Exception('Prim cannot be used in graphs with negative weights')
+        if self.kind == 'list':
+            cost = np.full(len(self.vertices), np.inf, dtype=np.float32)
+            V = np.arange(len(self.vertices), dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            cost[s-1] = 0
+
+            parents = np.full(len(self.vertices), -1)
+            levels = np.full(len(self.vertices), -1)
+            levels[s-1] = 0
+            
+            while np.array_equal(V, np.sort(S)) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                cost_min = cost[diff].min()
+                if cost_min == np.inf:
+                    break
+                idx = np.where(cost==cost_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                for i in range(len(self.vertices[u].vizinhos)):
+                    w = self.vertices[u].vizinhos[i]
+                    if cost[w-1] > self.vertices[u].weights[i]:
+                        cost[w-1] = self.vertices[u].weights[i]
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
+            
+            with open('prim.txt', 'w') as f:
+                f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(s))
+                f.write('com peso total {}:\n'.format(cost.sum()))
+                f.write('Vertice | Parent | Level\n')
+                for v in self.vertices:
+                    f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
+        else:
+            raise Exception('This graph was not initialized')
+
+    def floydWarshall (self, s):
+        if self.weighted == 0:
+            raise Exception('Floyd-Warshall is not to be used in graphs without weights')
+        if self.negative == 0:
+            raise Exception('Use Dijkstra in graphs without negative edges.')
+        if self.kind == 'list':
+            dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
+            for i in range(len(self.vertices)):
+                dist[i][i] = 0
+
+            # A0 floyd-warshall
+            for i in range(len(self.vertices)):
+                for j in range(len(self.vertices[i].vizinhos)):
+                    w = self.vertices[i].vizinhos[j]
+                    dist[i][w-1] = self.vertices[i].weights[j]
+                    dist[w-1][i] = self.vertices[i].weights[j]
+            print(dist)
+            
+            for k in range(len(self.vertices)):
+                for i in range(len(self.vertices)):
+                    for j in range(len(self.vertices)):
+                        if dist[i][j] > dist[i][k] + dist[k][j]:
+                            dist[i][j] = dist[i][k] + dist[k][j]
+                print(dist)
+        else:
+            raise Exception('This graph was not initialized')
+
     def distancia(self, v1, v2):
         """"Determines the distance between vertices v1 and v2"""
         bfsResult = self.__bfsD__(v1)
@@ -536,6 +581,7 @@ class Graph:
                 f.write(str(level[v2 - 1]) + '\n')
         
     def diametro(self):
+        """"Determines the diameter of a given weightless graph"""
         if(self.weighted == 0):
             # Determines the diameter of a given graph by calculating the diameter in the
             # biggest connected component
@@ -558,6 +604,7 @@ class Graph:
             raise Exception('Invalid graph, must be weigthless.')
     
     def diametro2(self):
+        """"Determines the diameter of a given weightless graph"""
         if(self.weighted == 0):
             # Determines the diameter of a given graph by randomly selecting k = log_2 n
             # vertices, calculating the diameter in these vertices and choosing the biggest one
@@ -580,7 +627,7 @@ class Graph:
             raise Exception('Invalid graph, must be weigthless.')
 
     def conexos(self):
-        """Determines the connected components of a weightless graph"""
+        """Determines the connected components of a given weightless graph"""
         if(self.weighted == 0):
             if(self.kind == 'list'):
                 aux = 1
@@ -617,8 +664,8 @@ class Graph:
             raise Exception('Invalid graph, must be weigthless.')
 
     def info(self, filename):
-        # This functions write in a file named filename information about the graph
-        if self.kind in ['list', 'matrix']:
+        """Writes in a file named filename informations about a given weightless graph"""
+        if (self.kind in ['list', 'matrix']) and (self.weighted == 0):
             with open(filename, 'w') as f:
                 info0 = "O grafo possui {} vertices e {} arestas.\n"\
                     .format(str(self.n), str(self.m))
@@ -663,46 +710,7 @@ class Graph:
                 text = info0 + info1 + info2
                 f.write(text)
         else:
-            raise Exception('Invalid kind.')
-
-    def prim(self, s):
-        if self.weighted == 0:
-            raise Exception('Prim is not to be used in graphs without weights')
-        if self.negative == 1:
-            raise Exception('Prim cannot be used in graphs with negative weights')
-        if self.kind == 'list':
-            cost = np.full(len(self.vertices), np.inf, dtype=np.float32)
-            V = np.arange(len(self.vertices), dtype=np.uint32)
-            S = np.array([], dtype=np.uint32)
-            cost[s-1] = 0
-
-            parents = np.full(len(self.vertices), -1)
-            levels = np.full(len(self.vertices), -1)
-            levels[s-1] = 0
-            
-            while np.array_equal(V, np.sort(S)) != True:
-                diff = np.setdiff1d(V, S, assume_unique=True)
-                cost_min = cost[diff].min()
-                if cost_min == np.inf:
-                    break
-                idx = np.where(cost==cost_min)
-                u = np.intersect1d(idx[0], diff)[0]
-                S = np.append(S, u)
-                for i in range(len(self.vertices[u].vizinhos)):
-                    w = self.vertices[u].vizinhos[i]
-                    if cost[w-1] > self.vertices[u].weights[i]:
-                        cost[w-1] = self.vertices[u].weights[i]
-                        parents[w-1] = u+1
-                        levels[w-1] = levels[u]+1
-            
-            with open('prim.txt', 'w') as f:
-                f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(s))
-                f.write('com peso total {}:\n'.format(cost.sum()))
-                f.write('Vertice | Parent | Level\n')
-                for v in self.vertices:
-                    f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
-        else:
-            raise Exception('This graph was not initialized')
+            raise Exception('Invalid kind of graph.')
 
 class Vertice:
     def __init__(self, id):
