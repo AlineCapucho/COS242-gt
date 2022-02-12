@@ -456,9 +456,7 @@ class Graph:
             dist[s-1] = 0
 
             parents = np.full(len(self.vertices), -1)
-            levels = np.full(len(self.vertices), -1)
-            levels[s-1] = 0
-            path = []
+            path = np.array([], dtype=np.uint32)
             
             while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
@@ -468,18 +466,20 @@ class Graph:
                 idx = np.where(dist==dist_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
-                # para cada vizinho v de u
                 for i in range(0, len(self.vertices[u].vizinhos), 1):
                     w = self.vertices[u].vizinhos[i]
-                    print(u, w)
-                    print(S)
                     if w not in S:
-                        parents[w-1] = u+1
-                        levels[w-1] = levels[u]+1
+                        parents[w-1] = int(u)+1
                     if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
                         dist[w-1] = dist[u] + self.vertices[u].weights[i]
                 if (u == d):
                     break
+
+            p = d
+            path = np.append(path, d)
+            while(p!=s):
+                path = np.append(path, parents[p-1])
+                p = parents[p-1]
             
             with open('dijkstra.txt', 'w') as f:
                 f.write('Resultado de Dijsktra entre os vértices {} e {}:\n'.format(s, d))
@@ -503,6 +503,7 @@ class Graph:
 
             parents = np.full(len(self.vertices), -1)
             levels = np.full(len(self.vertices), -1)
+            path = np.full((len(self.vertices), 1), -1, dtype=np.float32)
             levels[s-1] = 0
             
             while np.array_equal(V, np.sort(S)) != True:
@@ -513,12 +514,8 @@ class Graph:
                 idx = np.where(dist==dist_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
-                path = []
-                # para cada vizinho v de u
                 for i in range(0, len(self.vertices[u].vizinhos), 1):
                     w = self.vertices[u].vizinhos[i]
-                    print(u, w)
-                    print(S)
                     if w not in S:
                         parents[w-1] = u+1
                         levels[w-1] = levels[u]+1
@@ -761,5 +758,5 @@ class Vertice:
 mygraph = Graph()
 mygraph.create_from_file('test.txt', kind='list')
 
-print(mygraph.dijkstra(1, 5))
+print(mygraph.dijkstra(1,6))
 #### TAIL ####
