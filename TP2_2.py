@@ -480,6 +480,7 @@ class Graph:
             while(p!=s):
                 path = np.append(path, parents[p-1])
                 p = parents[p-1]
+            path.reverse()
             
             with open('dijkstra.txt', 'w') as f:
                 f.write('Resultado de Dijsktra entre os vértices {} e {}:\n'.format(s, d))
@@ -542,6 +543,34 @@ class Graph:
                     f.write('{} | {} | {}\n'.format(v.id, dist[v.id-1], path[v.id-1]))
         else:
             raise Exception('This graph was not initialized')
+
+    def __dijkstraD__(self, s, d):
+        """Runs dijkstra on positively-weighted graph from s to d
+        Returns the distance between s and d"""
+        if self.weighted == 0 or self.negative == 1:
+            raise Exception('Dijkstra cannot be used in weightless graphs or graphs with negative weights')
+        if self.kind == 'list':
+            dist = np.full(len(self.vertices), np.inf, dtype=np.float32)
+            V = np.arange(len(self.vertices), dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            dist[s-1] = 0
+            
+            while np.array_equal(V, np.sort(S)) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                dist_min = dist[diff].min()
+                if dist_min == np.inf:
+                    break
+                idx = np.where(dist==dist_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                for i in range(0, len(self.vertices[u].vizinhos), 1):
+                    w = self.vertices[u].vizinhos[i]
+                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                if (u == d):
+                    break
+
+            return dist[d-1]
 
     def prim(self, s):
         """Used to determined the MST of a given positively-weighted graph"""
@@ -615,7 +644,9 @@ class Graph:
         if self.negative == 1:
             print("use floyd-warshall")
         elif self.weighted == 1:
-            print("use dijkstra")
+            d = self.__dijkstraD__(v1, v2)
+            with open('distancia.txt', 'w') as f:
+                    f.write(str(d) + '\n')
         else:
             bfsResult = self.__bfsD__(v1)
             level = bfsResult
@@ -772,5 +803,5 @@ class Vertice:
 mygraph = Graph()
 mygraph.create_from_file('test.txt', kind='list')
 
-print(mygraph.dijkstraAll(1))
+print(mygraph.distancia(1))
 #### TAIL ####
