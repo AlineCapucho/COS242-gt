@@ -503,8 +503,11 @@ class Graph:
 
             parents = np.full(len(self.vertices), -1)
             levels = np.full(len(self.vertices), -1)
-            path = np.full((len(self.vertices), 1), -1, dtype=np.float32)
+            path = []
             levels[s-1] = 0
+
+            for i in range(len(self.vertices)):
+                path.append([])
             
             while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
@@ -522,14 +525,21 @@ class Graph:
                     if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
                         dist[w-1] = dist[u] + self.vertices[u].weights[i]
             
+            for i in range(len(self.vertices)):
+                if i!=(s-1):
+                    path[i].append(i+1)
+                    p = i
+                    while(p!=s):
+                        path[i].append(int(parents[p]))
+                        p = parents[p]-1
+                path[i].append(s)
+                path[i].reverse()
+            
             with open('dijkstraall.txt', 'w') as f:
                 f.write('Resultado de Dijsktra feito no vértice {}:\n'.format(s))
-                # f.write('Vertice | Parent | Level\n')
-                # for v in self.vertices:
-                #     f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
                 f.write('Vertice | Distance | Path\n')
                 for v in self.vertices:
-                    f.write('{} | {} | {}\n'.format(v.id, dist[v.id-1], path))
+                    f.write('{} | {} | {}\n'.format(v.id, dist[v.id-1], path[v.id-1]))
         else:
             raise Exception('This graph was not initialized')
 
@@ -602,15 +612,19 @@ class Graph:
 
     def distancia(self, v1, v2):
         """"Determines the distance between vertices v1 and v2"""
-        bfsResult = self.__bfsD__(v1)
-        level = bfsResult
-
-        if (level[v2 - 1] == 0):
-            with open('distancia.txt', 'w') as f:
-                f.write(str(float('inf')) + '\n')
+        if self.negative == 1:
+            print("use floyd-warshall")
+        elif self.weighted == 1:
+            print("use dijkstra")
         else:
-            with open('distancia.txt', 'w') as f:
-                f.write(str(level[v2 - 1]) + '\n')
+            bfsResult = self.__bfsD__(v1)
+            level = bfsResult
+            if (level[v2 - 1] == 0):
+                with open('distancia.txt', 'w') as f:
+                    f.write(str(float('inf')) + '\n')
+            else:
+                with open('distancia.txt', 'w') as f:
+                    f.write(str(level[v2 - 1]) + '\n')
         
     def diametro(self):
         """"Determines the diameter of a given weightless graph"""
@@ -758,5 +772,5 @@ class Vertice:
 mygraph = Graph()
 mygraph.create_from_file('test.txt', kind='list')
 
-print(mygraph.dijkstra(1,6))
+print(mygraph.dijkstraAll(1))
 #### TAIL ####
