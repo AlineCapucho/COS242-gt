@@ -350,16 +350,16 @@ class Digraph:
                 S = np.append(S, u)
                 for i in range(self.vertices[u].fromV.size):
                     w = self.vertices[u].fromV[i]
-                    if w not in S:
-                        parents[w-1] = u+1
-                        levels[w-1] = levels[u]+1
-                    if cost[w-1] > self.vertices[u].weights[i]:
-                        cost[w-1] = self.vertices[u].weights[i]
+                    if w-1 not in S:
+                        if cost[w-1] > self.vertices[u].weights[i]:
+                            cost[w-1] = self.vertices[u].weights[i]
+                            parents[w-1] = u+1
+                            levels[w-1] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
-                f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
-                f.write(f'com peso total {cost.sum()}:\n')
-                f.write(f'Vertice | Parent\n')
+                # f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
+                # f.write(f'com peso total {cost.sum()}:\n')
+                # f.write(f'Vertice | Parent\n')
                 for v in self.vertices:
                     f.write(f'{v.id} | {parents[v.id-1]}\n')
         elif self.kind == 'matrix':
@@ -383,17 +383,17 @@ class Digraph:
                 for w in range(self.n):
                     if self.matrix[u, w] == 1:
                         if w not in S:
-                            parents[w] = u+1
-                            levels[w] = levels[u]+1
-                        if cost[w] > self.matrix_weights[u, w]:
-                            cost[w] = self.matrix_weights[u, w]
+                            if cost[w] > self.matrix_weights[u, w]:
+                                cost[w] = self.matrix_weights[u, w]
+                                parents[w] = u+1
+                                levels[w] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
-                f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
-                f.write(f'com peso total {cost.sum()}:\n')
-                f.write(f'Vertice | Parent\n')
-                for v in self.vertices:
-                    f.write(f'{v.id} | {parents[v.id-1]}\n')
+                # f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
+                # f.write(f'com peso total {cost.sum()}:\n')
+                # f.write(f'Vertice | Parent\n')
+                for v in range(self.n):
+                    f.write(f'{v+1} | {parents[v]}\n')
         else:
             raise Exception('This graph was not initialized')
 
@@ -410,5 +410,6 @@ class Vertice:
 
 mygraph = Digraph()
 mygraph.create_from_file('testdigraph.txt', kind='list')
+mygraph.prim(5)
 
 #### TAIL ####

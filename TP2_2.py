@@ -604,9 +604,9 @@ class Graph:
                         levels[w-1] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
-                f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(s))
-                f.write('com peso total {}:\n'.format(cost.sum()))
-                f.write('Vertice | Parent | Level\n')
+                # f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(s))
+                # f.write('com peso total {}:\n'.format(cost.sum()))
+                # f.write('Vertice | Parent | Level\n')
                 for v in self.vertices:
                     f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
         else:
