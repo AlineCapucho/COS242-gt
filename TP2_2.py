@@ -442,15 +442,49 @@ class Graph:
         else:
             raise Exception('Invalid graph, must be weigthless.')
 
-    def dijkstra(self, v1, v2):
-        """Runs dijkstra on positively-weighted graph from v1 to v2
-        Returns the distance and minimum path between v1 and v2"""
+    def dijkstra(self, s, d):
+        """Runs dijkstra on positively-weighted graph from s to d
+        Returns the distance and minimum path between s and d"""
         if self.weighted == 0:
             raise Exception('Dijkstra is not to be used in graphs without weights')
         if self.negative == 1:
             raise Exception('Dijkstra cannot be used in graphs with negative weights')
         if self.kind == 'list':
-            print("dijkstra between two vertices")
+            dist = np.full(len(self.vertices), np.inf, dtype=np.float32)
+            V = np.arange(len(self.vertices), dtype=np.uint32)
+            S = np.array([], dtype=np.uint32)
+            dist[s-1] = 0
+
+            parents = np.full(len(self.vertices), -1)
+            levels = np.full(len(self.vertices), -1)
+            levels[s-1] = 0
+            path = []
+            
+            while np.array_equal(V, np.sort(S)) != True:
+                diff = np.setdiff1d(V, S, assume_unique=True)
+                dist_min = dist[diff].min()
+                if dist_min == np.inf:
+                    break
+                idx = np.where(dist==dist_min)
+                u = np.intersect1d(idx[0], diff)[0]
+                S = np.append(S, u)
+                # para cada vizinho v de u
+                for i in range(0, len(self.vertices[u].vizinhos), 1):
+                    w = self.vertices[u].vizinhos[i]
+                    print(u, w)
+                    print(S)
+                    if w not in S:
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
+                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                if (u == d):
+                    break
+            
+            with open('dijkstra.txt', 'w') as f:
+                f.write('Resultado de Dijsktra entre os vértices {} e {}:\n'.format(s, d))
+                f.write('Distância: {}\n'.format(dist[d-1]))
+                f.write('Caminho: {}\n'.format(path))
         else:
             raise Exception('This graph was not initialized')
 
@@ -479,6 +513,7 @@ class Graph:
                 idx = np.where(dist==dist_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
+                path = []
                 # para cada vizinho v de u
                 for i in range(0, len(self.vertices[u].vizinhos), 1):
                     w = self.vertices[u].vizinhos[i]
@@ -490,14 +525,14 @@ class Graph:
                     if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
                         dist[w-1] = dist[u] + self.vertices[u].weights[i]
             
-            with open('dijkstra.txt', 'w') as f:
+            with open('dijkstraall.txt', 'w') as f:
                 f.write('Resultado de Dijsktra feito no vértice {}:\n'.format(s))
                 # f.write('Vertice | Parent | Level\n')
                 # for v in self.vertices:
                 #     f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
                 f.write('Vertice | Distance | Path\n')
                 for v in self.vertices:
-                    f.write('{} | {} | {}\n'.format(v.id, dist[v.id-1], path[v.id-1]))
+                    f.write('{} | {} | {}\n'.format(v.id, dist[v.id-1], path))
         else:
             raise Exception('This graph was not initialized')
 
@@ -726,5 +761,5 @@ class Vertice:
 mygraph = Graph()
 mygraph.create_from_file('test.txt', kind='list')
 
-print(mygraph.prim(1))
+print(mygraph.dijkstra(1, 5))
 #### TAIL ####
