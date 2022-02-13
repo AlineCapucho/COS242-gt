@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import deque
 import itertools as iter
+from logging import raiseExceptions
 import numpy as np
 import random
 import math
@@ -613,7 +614,7 @@ class Graph:
             raise Exception('This graph was not initialized')
 
     def negativeCycle(self):
-        """Checks if the graph has any cycles"""
+        """Checks if the graph has negative weight cycles"""
         if self.weighted == 0 or self.negative == 0:
             raise Exception('Must be used on graphs with negative weights')
         else:
@@ -625,7 +626,7 @@ class Graph:
         if self.negative == 0:
             raise Exception('Use Dijkstra in graphs without negative edges.')
         if self.kind == 'list':
-            if self.negativeCycle == False: 
+            if self.negativeCycle() == False: 
                 dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
                 for i in range(len(self.vertices)):
                     dist[i][i] = 0
@@ -636,30 +637,44 @@ class Graph:
 
                 for i in range(len(self.vertices)):
                     path.append([])
+                
+                for i in range(len(self.vertices)):
                     for j in range(len(self.vertices[i].vizinhos)):
                         w = self.vertices[i].vizinhos[j]
                         dist[i][w-1] = self.vertices[i].weights[j]
                         dist[w-1][i] = self.vertices[i].weights[j]
+                    path[i] = [i+1]
                 
                 for k in range(len(self.vertices)):
                     for i in range(len(self.vertices)):
-                        for j in range(len(self.vertices)):
-                            if dist[i][j] > dist[i][k] + dist[k][j]:
-                                dist[i][j] = dist[i][k] + dist[k][j]
-                                if(i<j):
-                                    parents[j] = k+1
+                        for j in range(i, len(self.vertices)):
+                            if (k!=i and k!=j and i!=j) and not((i+1) in path[k] and (i+1) in path[j]):
+                                if dist[i][j] > dist[i][k] + dist[k][j]:
+                                    dist[i][j] = dist[i][k] + dist[k][j]
+                                    dist[j][i] = dist[i][j]
+                                    path[j] = list(path[k])
+                                    path[j].append(k+1)
+                                    path[i] = list(path[k])
+                                    path[i].append(k+1)
+
+                print(dist)
                 
-                for i in range(len(self.vertices)):
-                    if(i!=(s-1)):
-                        if(parents[i]==-1):
-                            parents[i]=s
-                        path[i].append(i+1)
-                        p = i
-                        while(p!=s):
-                            path[i].append(int(parents[p]))
-                            p = parents[p]-1
-                    path[i].append(s)
-                    path[i].reverse()
+                for k in range(len(self.vertices)):
+                    for i in range(len(self.vertices)):
+                        if dist[i][i] > dist[i][k] + dist[k][i]:
+                            raiseExceptions("Negative weight cycle")
+
+                # for i in range(len(self.vertices)):
+                #     if(i!=(s-1)):
+                #         if(parents[i]==-1):
+                #             parents[i]=s
+                #         path[i].append(i+1)
+                #         p = i
+                #         while(p!=s):
+                #             path[i].append(int(parents[p]))
+                #             p = parents[p]-1
+                #     path[i].append(s)
+                #     path[i].reverse()
 
                 with open('floydwarshall.txt', 'w') as f:
                     f.write('Resultado de Floyd-Warshall feito no vértice {}:\n'.format(s))
@@ -677,7 +692,7 @@ class Graph:
         if self.negative == 0:
             raise Exception('Use Dijkstra in graphs without negative edges.')
         if self.kind == 'list':
-            if self.negativeCycle == False: 
+            if self.negativeCycle() == False: 
                 dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
                 for i in range(len(self.vertices)):
                     dist[i][i] = 0
@@ -889,7 +904,7 @@ class Vertice:
 #### Testing ####
 
 mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='list')
+mygraph.create_from_file('test3.txt', kind='list')
 
 print(mygraph.floydWarshallAll(1))
 #### TAIL ####
