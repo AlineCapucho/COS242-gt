@@ -749,7 +749,41 @@ class Graph:
             raise Exception('This graph was not initialized')
 
     def __floydWarshallD__(self, s, d):
-        print("distancia")
+        dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
+        for i in range(len(self.vertices)):
+            dist[i][i] = 0
+
+        visited = []
+
+        for i in range(len(self.vertices)):
+            visited.append([])
+                
+        for i in range(len(self.vertices)):
+            for j in range(len(self.vertices[i].vizinhos)):
+                w = self.vertices[i].vizinhos[j]
+                dist[i][w-1] = self.vertices[i].weights[j]
+                dist[w-1][i] = self.vertices[i].weights[j]
+            
+        for k in range(len(self.vertices)):
+            for i in range(len(self.vertices)):
+                for j in range(i, len(self.vertices)):
+                    if (k!=i and k!=j and i!=j) and not((i+1) in visited[k] and (i+1) in visited[j]):
+                        if dist[i][j] > dist[i][k] + dist[k][j]:
+                            dist[i][j] = dist[i][k] + dist[k][j]
+                            dist[j][i] = dist[i][j]
+                            visited[j] = list(visited[k])
+                            visited[j].append(k+1)
+                            visited[i] = list(visited[k])
+                            visited[i].append(k+1)
+
+        for k in range(len(self.vertices)):
+            for i in range(len(self.vertices)):
+                for j in range(i, len(self.vertices)):
+                    if (k!=i and k!=j and i!=j) and not((i+1) in visited[k] and (i+1) in visited[j]):
+                        if dist[i][j] > dist[i][k] + dist[k][j]:
+                            raiseExceptions("Negative weight cycle")
+        
+        return dist[s-1][d-1]
 
     def distancia(self, v1, v2):
         """"Determines the distance between vertices v1 and v2"""
