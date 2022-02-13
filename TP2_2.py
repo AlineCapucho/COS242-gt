@@ -615,38 +615,66 @@ class Graph:
     def floydWarshall (self, s):
         if self.weighted == 0:
             raise Exception('Floyd-Warshall is not to be used in graphs without weights')
-        if self.negative == 0:
-            raise Exception('Use Dijkstra in graphs without negative edges.')
+        # if self.negative == 0:
+        #     raise Exception('Use Dijkstra in graphs without negative edges.')
         if self.kind == 'list':
             dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
             for i in range(len(self.vertices)):
                 dist[i][i] = 0
 
-            # A0 floyd-warshall
+            parents = np.full(len(self.vertices), -1)
+            parents[s-1] = -1
+            path = []
+
             for i in range(len(self.vertices)):
+                path.append([])
                 for j in range(len(self.vertices[i].vizinhos)):
                     w = self.vertices[i].vizinhos[j]
                     dist[i][w-1] = self.vertices[i].weights[j]
                     dist[w-1][i] = self.vertices[i].weights[j]
-            print(dist)
             
             for k in range(len(self.vertices)):
                 for i in range(len(self.vertices)):
                     for j in range(len(self.vertices)):
                         if dist[i][j] > dist[i][k] + dist[k][j]:
                             dist[i][j] = dist[i][k] + dist[k][j]
-                print(dist)
+                            if(i<j):
+                                parents[j] = k+1
+            
+            for i in range(len(self.vertices)):
+                if(i!=(s-1)):
+                    if(parents[i]==-1):
+                        parents[i]=s
+                    path[i].append(i+1)
+                    p = i
+                    while(p!=s):
+                        path[i].append(int(parents[p]))
+                        p = parents[p]-1
+                path[i].append(s)
+                path[i].reverse()
+
+            with open('floydwarshall.txt', 'w') as f:
+                f.write('Resultado de Floyd-Warshall feito no vértice {}:\n'.format(s))
+                f.write('Vertice | Distance | Path\n')
+                for v in self.vertices:
+                    f.write('{} | {} | {}\n'.format(v.id, dist[0][v.id-1], path[v.id-1]))
+
         else:
             raise Exception('This graph was not initialized')
+
+    def __floydWarshallD__ (self, s, d):
+        print("distancia")
 
     def distancia(self, v1, v2):
         """"Determines the distance between vertices v1 and v2"""
         if self.negative == 1:
-            print("use floyd-warshall")
+            d = self.__floydWarshallD__(v1, v2)
+            with open('distancia.txt', 'w') as f:
+                f.write(str(d) + '\n')
         elif self.weighted == 1:
             d = self.__dijkstraD__(v1, v2)
             with open('distancia.txt', 'w') as f:
-                    f.write(str(d) + '\n')
+                f.write(str(d) + '\n')
         else:
             bfsResult = self.__bfsD__(v1)
             level = bfsResult
@@ -656,7 +684,7 @@ class Graph:
             else:
                 with open('distancia.txt', 'w') as f:
                     f.write(str(level[v2 - 1]) + '\n')
-        
+    
     def diametro(self):
         """"Determines the diameter of a given weightless graph"""
         if(self.weighted == 0):
@@ -803,5 +831,5 @@ class Vertice:
 mygraph = Graph()
 mygraph.create_from_file('test.txt', kind='list')
 
-print(mygraph.distancia(1))
+print(mygraph.floydWarshall(1))
 #### TAIL ####
