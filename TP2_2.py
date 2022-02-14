@@ -481,7 +481,7 @@ class Graph:
             while(p!=s):
                 path = np.append(path, parents[p-1])
                 p = parents[p-1]
-            path.reverse()
+            path = np.flip(path)
             
             with open('dijkstra.txt', 'w') as f:
                 f.write('Resultado de Dijsktra entre os vértices {} e {}:\n'.format(s, d))
@@ -788,14 +788,17 @@ class Graph:
     def distancia(self, v1, v2):
         """"Determines the distance between vertices v1 and v2"""
         if self.negative == 1:
+            print('Negative-weighted')
             d = self.__floydWarshallD__(v1, v2)
             with open('distancia.txt', 'w') as f:
                 f.write(str(d) + '\n')
         elif self.weighted == 1:
+            print('Positive-weighted')
             d = self.__dijkstraD__(v1, v2)
             with open('distancia.txt', 'w') as f:
                 f.write(str(d) + '\n')
         else:
+            print('Non-weighted')
             bfsResult = self.__bfsD__(v1)
             level = bfsResult
             if (level[v2 - 1] == 0):
@@ -948,8 +951,8 @@ class Vertice:
 
 #### Testing ####
 
-mygraph = Graph()
-mygraph.create_from_file('test3.txt', kind='list')
+# mygraph = Graph()
+# mygraph.create_from_file('test3.txt', kind='list')
 
-print(mygraph.floydWarshallAll(1))
+# print(mygraph.floydWarshallAll(1))
 #### TAIL ####
