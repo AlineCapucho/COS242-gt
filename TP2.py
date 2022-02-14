@@ -280,10 +280,10 @@ class Digraph:
                 for i in range(self.vertices[u].fromV.size):
                     w = self.vertices[u].fromV[i]
                     if w not in S:
-                        parents[w-1] = u+1
-                        levels[w-1] = levels[u]+1
-                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
-                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                        if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                            dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                            parents[w-1] = u+1
+                            levels[w-1] = levels[u]+1
             
             with open('dijkstra.txt', 'w') as f:
                 f.write(f'Resultado de Dijsktra feito no vértice {u}:\n')
@@ -312,10 +312,10 @@ class Digraph:
                 for w in range(self.n):
                     if self.matrix[u, w] == 1:
                         if w not in S:
-                            parents[w] = u+1
-                            levels[w] = levels[u]+1
-                        if dist[w] > dist[u] + self.matrix_weights[u, w]:
-                            dist[w] = dist[u] + self.matrix_weights[u, w]
+                            if dist[w] > dist[u] + self.matrix_weights[u, w]:
+                                dist[w] = dist[u] + self.matrix_weights[u, w]
+                                parents[w] = u+1
+                                levels[w] = levels[u]+1
             
             with open('dijkstra.txt', 'w') as f:
                 f.write(f'Resultado de Dijsktra feito no vértice {u}:\n')
