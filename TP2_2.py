@@ -470,9 +470,12 @@ class Graph:
                 for i in range(0, len(self.vertices[u].vizinhos), 1):
                     w = self.vertices[u].vizinhos[i]
                     if w not in S:
-                        parents[w-1] = int(u)+1
-                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
-                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                    #     parents[w-1] = int(u)+1
+                    # if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                    #     dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                        if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                            dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                            parents[w-1] = int(u)+1
                 if (u == d):
                     break
 
@@ -522,10 +525,14 @@ class Graph:
                 for i in range(0, len(self.vertices[u].vizinhos), 1):
                     w = self.vertices[u].vizinhos[i]
                     if w not in S:
-                        parents[w-1] = u+1
-                        levels[w-1] = levels[u]+1
-                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
-                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                    #     parents[w-1] = u+1
+                    #     levels[w-1] = levels[u]+1
+                    # if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                    #     dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                        if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                            dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                            parents[w-1] = u+1
+                            levels[w-1] = levels[u]+1
             
             for i in range(len(self.vertices)):
                 if i!=(s-1):
