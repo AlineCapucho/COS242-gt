@@ -71,7 +71,6 @@ class Graph:
             # Gets the number of vertices, sets it in the object then initializes
             # the graus fields
             n = int(f.readline())
-            self.n = n
             if kind == 'list':
                 self.kind = 'list'
                 for i in range(1, n+1):
@@ -958,8 +957,8 @@ class Vertice:
 
 #### Testing ####
 
-mygraph = Graph()
-mygraph.create_from_file('test.txt', kind='list')
+# mygraph = Graph()
+# mygraph.create_from_file('test.txt', kind='list')
 
-print(mygraph.dijkstraAll(4))
+# print(mygraph.dijkstraAll(4))
 #### TAIL ####
