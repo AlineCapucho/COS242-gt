@@ -514,6 +514,7 @@ class Graph:
             for i in range(len(self.vertices)):
                 path.append([])
             
+        
             while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
                 dist_min = dist[diff].min()
@@ -522,26 +523,25 @@ class Graph:
                 idx = np.where(dist==dist_min)
                 u = np.intersect1d(idx[0], diff)[0]
                 S = np.append(S, u)
-                for i in range(0, len(self.vertices[u].vizinhos), 1):
+                for i in range(len(self.vertices[u].vizinhos)):
                     w = self.vertices[u].vizinhos[i]
-                    if w not in S:
-                    #     parents[w-1] = u+1
-                    #     levels[w-1] = levels[u]+1
-                    # if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
-                    #     dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                    if w not in S and s==1:
                         if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
                             dist[w-1] = dist[u] + self.vertices[u].weights[i]
                             parents[w-1] = u+1
                             levels[w-1] = levels[u]+1
-            
+                    elif dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                        parents[w-1] = u+1
+                        levels[w-1] = levels[u]+1
+
             for i in range(len(self.vertices)):
                 if i!=(s-1):
                     path[i].append(i+1)
                     p = i
-                    while(p!=s):
+                    while(p!=(s-1)):
                         path[i].append(int(parents[p]))
                         p = parents[p]-1
-                path[i].append(s)
                 path[i].reverse()
             
             with open('dijkstraall.txt', 'w') as f:
@@ -958,8 +958,8 @@ class Vertice:
 
 #### Testing ####
 
-# mygraph = Graph()
-# mygraph.create_from_file('test3.txt', kind='list')
+mygraph = Graph()
+mygraph.create_from_file('test.txt', kind='list')
 
-# print(mygraph.floydWarshallAll(1))
+print(mygraph.dijkstraAll(4))
 #### TAIL ####
