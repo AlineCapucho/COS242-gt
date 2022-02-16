@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import deque
 import itertools as iter
+from logging import raiseExceptions
 import random
 import math
 import copy
@@ -131,22 +132,22 @@ class Digraph:
     def __repr__(self):
         # Creates a print representation to visualize the contents
         if self.kind == 'list':
-            vertices = f'number of vertices: {self.n}\n'
+            vertices = 'number of vertices: {}\n'.format(self.n)
             edges = ''
 
             for v in self.vertices:
-                edges += f'edges from vertice {v.id}: {v.fromV}\n'
+                edges += 'edges from vertice {}: {}\n'.format(v.id, v.fromV)
             
             return vertices + edges
         elif self.kind == 'matrix':
-            vertices = f'number of vertices: {self.n}\n'
+            vertices = 'number of vertices: {}\n'.format(self.n)
             edges = ''
 
             for v in range(self.n):
-                edges += f'edges from vertice {v+1}: ['
+                edges += 'edges from vertice {}: ['.format(v+1)
                 for e in range(self.n):
                     if self.matrix[v,e] == 1:
-                        edges += f'{e+1}. '
+                        edges += '{}. '.format(e+1)
                 edges += ']\n'
             
             return vertices + edges
@@ -172,11 +173,11 @@ class Digraph:
                         parents[w-1] = v
                         levels[w-1] = levels[v-1]+1
             
-            with open('bfs.txt', 'w') as f:
-                f.write(f'Resultado da BFS feita no vértice {u}:\n')
-                f.write(f'Vertice | Parent | Level\n')
+            with open('bfsDirected.txt', 'w') as f:
+                f.write('Resultado da BFS feita no vértice {}:\n'.format(u))
+                f.write('Vertice | Parent | Level\n')
                 for v in self.vertices:
-                    f.write(f'{v.id} | {parents[v.id-1]} | {levels[v.id-1]}\n')
+                    f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
         elif self.kind=='matrix':
             marks = np.zeros(self.n)
             parents = np.full(self.n, -1)
@@ -196,10 +197,10 @@ class Digraph:
                         levels[w-1] = levels[v-1]+1
             
             with open('bfs.txt', 'w') as f:
-                f.write(f'Resultado da BFS feita no vértice {u}:\n')
-                f.write(f'Vertice | Parent | Level\n')
+                f.write('Resultado da BFS feita no vértice {}:\n'.format(u))
+                f.write('Vertice | Parent | Level\n')
                 for v in range(1, self.n+1):
-                    f.write(f'{v} | {parents[v-1]} | {levels[v-1]}\n')
+                    f.write('{} | {} | {}\n'.format(v, parents[v-1], levels[v-1]))
         else:
             raise Exception('This graph was not initialized')
 
@@ -223,10 +224,10 @@ class Digraph:
                             levels[w-1] = levels[v-1]+1
             
             with open('dfs.txt', 'w') as f:
-                f.write(f'Resultado da DFS feita no vértice {u}:\n')
-                f.write(f'Vertice | Parent | Level\n')
+                f.write('Resultado da DFS feita no vértice {}:\n'.format(u))
+                f.write('Vertice | Parent | Level\n')
                 for v in self.vertices:
-                    f.write(f'{v.id} | {parents[v.id-1]} | {levels[v.id-1]}\n')
+                    f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
         elif self.kind=='matrix':
             marks = np.zeros(self.n)
             parents = np.full(self.n, -1)
@@ -246,11 +247,11 @@ class Digraph:
                                 parents[w-1] = v
                                 levels[w-1] = levels[v-1]+1
             
-            with open('dfs.txt', 'w') as f:
-                f.write(f'Resultado da DFS feita no vértice {u}:\n')
-                f.write(f'Vertice | Parent | Level\n')
+            with open('dfsDirected.txt', 'w') as f:
+                f.write('Resultado da DFS feita no vértice {}:\n'.format(u))
+                f.write('Vertice | Parent | Level\n')
                 for v in range(1, self.n+1):
-                    f.write(f'{v} | {parents[v-1]} | {levels[v-1]}\n')
+                    f.write('{} | {} | {}\n'.format(v, parents[v-1], levels[v-1]))
         else:
             raise Exception('This graph was not initialized')
 
@@ -285,11 +286,11 @@ class Digraph:
                             parents[w-1] = u+1
                             levels[w-1] = levels[u]+1
             
-            with open('dijkstra.txt', 'w') as f:
-                f.write(f'Resultado de Dijsktra feito no vértice {u}:\n')
-                f.write(f'Vertice | Parent | Level\n')
+            with open('dijkstraDirected.txt', 'w') as f:
+                f.write('Resultado de Dijsktra feito no vértice {}:\n'.format(u))
+                f.write('Vertice | Parent | Level\n')
                 for v in self.vertices:
-                    f.write(f'{v.id} | {parents[v.id-1]} | {levels[v.id-1]}\n')
+                    f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
         elif self.kind == 'matrix':
             dist = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
@@ -318,10 +319,49 @@ class Digraph:
                                 levels[w] = levels[u]+1
             
             with open('dijkstra.txt', 'w') as f:
-                f.write(f'Resultado de Dijsktra feito no vértice {u}:\n')
-                f.write(f'Vertice | Parent | Level\n')
+                f.write('Resultado de Dijsktra feito no vértice {}:\n'.format(u))
+                f.write('Vertice | Parent | Level\n')
                 for v in range(1, self.n+1):
-                    f.write(f'{v} | {parents[v-1]} | {levels[v-1]}\n')
+                    f.write('{} | {} | {}\n'.format(v, parents[v-1], levels[v-1]))
+        else:
+            raise Exception('This graph was not initialized')
+
+    def floydWarshall(self, s):
+        if self.weighted == 0:
+            raise Exception('Floyd-Warshall is not to be used in graphs without weights')
+        if self.negative == 0:
+            raise Exception('Use Dijkstra in graphs without negative edges.')
+        if self.kind == 'list':
+            dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
+            pred = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
+            for i in range(self.n):
+                dist[i][i] = 0
+
+            for i in range(self.n):
+                for j in range(self.vertices[i].fromV.size):
+                    w = self.vertices[i].fromV[j]
+                    dist[i][w-1] = self.vertices[i].weights[j]
+
+            print(dist)
+
+            for k in range(self.n):
+                for i in range(self.n):
+                    for j in range(self.n):
+                        if dist[i][j] > dist[i][k] + dist[k][j]:
+                            dist[i][j] = dist[i][k] + dist[k][j]
+            print(dist)
+
+            for k in range(self.n):
+                for i in range(self.n):
+                    for j in range(self.n):
+                        if dist[i][j] > dist[i][k] + dist[k][j]:
+                            raiseExceptions("Graph has a negative-weight cycle, shortest paths are undefined.")
+
+            # with open('floydWarshallDirected.txt', 'w') as f:
+            #     f.write('Resultado de Floyd-Warshall feito no vértice {}:\n'.format(s))
+            #     f.write('Vertice | Distance | Path\n')
+            #     for v in self.vertices:
+            #         f.write('{} | {} | {}\n'.format(v.id, dist[s-1][v.id-1], path[v.id-1]))
         else:
             raise Exception('This graph was not initialized')
 
@@ -357,11 +397,8 @@ class Digraph:
                             levels[w-1] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
-                # f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
-                # f.write(f'com peso total {cost.sum()}:\n')
-                # f.write(f'Vertice | Parent\n')
                 for v in self.vertices:
-                    f.write(f'{v.id} | {parents[v.id-1]}\n')
+                    f.write('{} | {}\n'.format(v.id, parents[v.id-1]))
         elif self.kind == 'matrix':
             cost = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
@@ -389,11 +426,8 @@ class Digraph:
                                 levels[w] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
-                # f.write(f'Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {u} ')
-                # f.write(f'com peso total {cost.sum()}:\n')
-                # f.write(f'Vertice | Parent\n')
                 for v in range(self.n):
-                    f.write(f'{v+1} | {parents[v]}\n')
+                    f.write('{} | {}\n'.format(v+1, parents[v]))
         else:
             raise Exception('This graph was not initialized')
 
@@ -409,7 +443,8 @@ class Vertice:
 #### Testing ####
 
 mygraph = Digraph()
-mygraph.create_from_file('testdigraph.txt', kind='list')
-mygraph.prim(5)
+mygraph.create_from_file('testidgraph.txt', kind='list')
+
+mygraph.floydWarshall(1)
 
 #### TAIL ####

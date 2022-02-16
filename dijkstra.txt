@@ -1,2 +1,0 @@
-Resultado de Dijsktra feito no vértice 1:
-Vertice | Distance | Path

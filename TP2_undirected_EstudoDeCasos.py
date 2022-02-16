@@ -1,4 +1,4 @@
-from TP2_2 import Graph, Vertice
+from TP2_undirected import Graph, Vertice
 import time
 import numpy as np
 import matplotlib.pyplot as plt
