@@ -182,8 +182,6 @@ class Digraph:
     def prim(self, s):
         if self.weighted == 0:
             raise Exception('Prim is not to be used in graphs without weights')
-        if self.negative == 1:
-            raise Exception('Prim cannot be used in graphs with negative weights')
         if self.kind == 'list':
             cost = np.full(self.n, np.inf, dtype=np.float32)
             V = np.arange(self.n, dtype=np.uint32)
@@ -210,9 +208,9 @@ class Digraph:
                             parents[w-1] = u+1
                             levels[w-1] = levels[u]+1
             
-            with open('prim.txt', 'w') as f:
+            with open('primDirected.txt', 'w') as f:
                 for v in self.vertices:
-                    f.write('{} | {}\n'.format(v.id, parents[v.id-1]))
+                    f.write('{} {}\n'.format(v.id, parents[v.id-1]))
         else:
             raise Exception('This graph was not initialized')
 
@@ -228,8 +226,8 @@ class Vertice:
 #### Testing ####
 
 mygraph = Digraph()
-mygraph.create_from_file('testidgraph.txt', kind='list')
+mygraph.create_from_file('test.txt', kind='list')
 
-mygraph.floydWarshall(1)
+mygraph.prim(1)
 
 #### TAIL ####
