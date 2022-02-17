@@ -604,10 +604,11 @@ class Graph:
                 S = np.append(S, u)
                 for i in range(len(self.vertices[u].vizinhos)):
                     w = self.vertices[u].vizinhos[i]
-                    if cost[w-1] > self.vertices[u].weights[i]:
-                        cost[w-1] = self.vertices[u].weights[i]
-                        parents[w-1] = u+1
-                        levels[w-1] = levels[u]+1
+                    if w-1 not in S:
+                        if cost[w-1] > self.vertices[u].weights[i]:
+                            cost[w-1] = self.vertices[u].weights[i]
+                            parents[w-1] = u+1
+                            levels[w-1] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
                 for v in self.vertices:
