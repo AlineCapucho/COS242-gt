@@ -620,7 +620,6 @@ class Graph:
         """"Determines the distance between vertices v1 and v2"""
         if self.negative == 1:
             print('Negative-weighted undirected graph, shortest paths undefined')
-            d = self.__floydWarshallD__(v1, v2)
             with open('distancia.txt', 'w') as f:
                 f.write('Undefined \n')
         elif self.weighted == 1:
