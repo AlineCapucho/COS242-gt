@@ -468,15 +468,13 @@ class Graph:
                 S = np.append(S, u)
                 for i in range(0, len(self.vertices[u].vizinhos), 1):
                     w = self.vertices[u].vizinhos[i]
-                    if w not in S:
-                    #     parents[w-1] = int(u)+1
-                    # if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
-                    #     dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                    if w not in S and s==1:
                         if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
                             dist[w-1] = dist[u] + self.vertices[u].weights[i]
-                            parents[w-1] = int(u)+1
-                if (u == d):
-                    break
+                            parents[w-1] = u+1
+                    elif dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                        dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                        parents[w-1] = u+1
 
             p = d
             path = np.append(path, d)
@@ -561,7 +559,7 @@ class Graph:
             V = np.arange(len(self.vertices), dtype=np.uint32)
             S = np.array([], dtype=np.uint32)
             dist[s-1] = 0
-            
+
             while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
                 dist_min = dist[diff].min()
@@ -572,10 +570,11 @@ class Graph:
                 S = np.append(S, u)
                 for i in range(0, len(self.vertices[u].vizinhos), 1):
                     w = self.vertices[u].vizinhos[i]
-                    if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                    if w not in S and s==1:
+                        if dist[w-1] > dist[u] + self.vertices[u].weights[i]:
+                            dist[w-1] = dist[u] + self.vertices[u].weights[i]
+                    elif dist[w-1] > dist[u] + self.vertices[u].weights[i]:
                         dist[w-1] = dist[u] + self.vertices[u].weights[i]
-                if (u == d):
-                    break
 
             return dist[d-1]
 
@@ -611,9 +610,6 @@ class Graph:
                         levels[w-1] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
-                # f.write('Árvore geradora mínima (MST) calculada com Prim\nfeito no vértice {} '.format(s))
-                # f.write('com peso total {}:\n'.format(cost.sum()))
-                # f.write('Vertice | Parent | Level\n')
                 for v in self.vertices:
                     f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
         else:
@@ -643,10 +639,9 @@ class Graph:
                     f.write(str(level[v2 - 1]) + '\n')
     
     def diametro(self):
-        """"Determines the diameter of a given weightless graph"""
+        """"Determines the diameter of a given weightless graph.
+        Calcules the diameter in the biggest connected component."""
         if(self.weighted == 0):
-            # Determines the diameter of a given graph by calculating the diameter in the
-            # biggest connected component
             if (self.n > 1000):
                 self.diametro2()
             else:
@@ -666,10 +661,9 @@ class Graph:
             raise Exception('Invalid graph, must be weigthless.')
     
     def diametro2(self):
-        """"Determines the diameter of a given weightless graph"""
+        """"Determines the diameter of a given weightless graph.
+        Randomly selects k = log_2 n vertices, calculating the diameter in these vertices and choosing the biggest one"""
         if(self.weighted == 0):
-            # Determines the diameter of a given graph by randomly selecting k = log_2 n
-            # vertices, calculating the diameter in these vertices and choosing the biggest one
 
             k = math.floor(math.log2(self.n))
             choices = []
@@ -776,17 +770,17 @@ class Graph:
 
 class Vertice:
     def __init__(self, id):
-        # Creates a vertice where id is the identifier, fromV contains the edges
-        # that comes from this Vertice and weighs contains the weight of each
-        # edges that comes from this Vertice
+        """Creates a vertice where id is the identifier, fromV contains the edges
+        that comes from this Vertice and weighs contains the weight of each
+        edges that comes from this Vertice"""
         self.id = id
         self.vizinhos = deque()
         self.weights = deque()
 
 #### Testing ####
 
-# mygraph = Graph()
-# mygraph.create_from_file('test.txt', kind='list')
+mygraph = Graph()
+mygraph.create_from_file('test.txt', kind='list')
 
-# print(mygraph.dijkstraAll(4))
+print(mygraph.prim(1))
 #### TAIL ####
