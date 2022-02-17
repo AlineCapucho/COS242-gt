@@ -583,7 +583,7 @@ class Graph:
         if self.weighted == 0:
             raise Exception('Prim is not to be used in graphs without weights')
         if self.negative == 1:
-            raise Exception('Prim cannot be used in graphs with negative weights')
+            raise Exception('Prim cannot be used in undirected graphs with negative weights')
         if self.kind == 'list':
             cost = np.full(len(self.vertices), np.inf, dtype=np.float32)
             V = np.arange(len(self.vertices), dtype=np.uint32)
@@ -591,8 +591,6 @@ class Graph:
             cost[s-1] = 0
 
             parents = np.full(len(self.vertices), -1)
-            levels = np.full(len(self.vertices), -1)
-            levels[s-1] = 0
             
             while np.array_equal(V, np.sort(S)) != True:
                 diff = np.setdiff1d(V, S, assume_unique=True)
@@ -608,11 +606,10 @@ class Graph:
                         if cost[w-1] > self.vertices[u].weights[i]:
                             cost[w-1] = self.vertices[u].weights[i]
                             parents[w-1] = u+1
-                            levels[w-1] = levels[u]+1
             
             with open('prim.txt', 'w') as f:
                 for v in self.vertices:
-                    f.write('{} | {} | {}\n'.format(v.id, parents[v.id-1], levels[v.id-1]))
+                    f.write('{} {}\n'.format(v.id, parents[v.id-1]))
         else:
             raise Exception('This graph was not initialized')
 
