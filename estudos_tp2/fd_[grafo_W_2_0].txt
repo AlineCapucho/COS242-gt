@@ -1,0 +1,14 @@
+Resultado de Floyd-Warshall entre os vértice 1 e 10:
+Distância: -inf
+
+Resultado de Floyd-Warshall entre os vértice 1 e 20:
+Distância: -inf
+
+Resultado de Floyd-Warshall entre os vértice 1 e 30:
+Distância: -inf
+
+Resultado de Floyd-Warshall entre os vértice 1 e 40:
+Distância: -inf
+
+Resultado de Floyd-Warshall entre os vértice 1 e 50:
+Distância: -inf
