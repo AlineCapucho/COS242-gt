@@ -140,42 +140,40 @@ class Digraph:
         else:
             raise Exception('This graph was not initialized')
 
-    def floydWarshall(self, s):
+    def floydWarshall(self, s, d):
         if self.weighted == 0:
             raise Exception('Floyd-Warshall is not to be used in graphs without weights')
         if self.negative == 0:
             raise Exception('Use Dijkstra in graphs without negative edges.')
         if self.kind == 'list':
-            dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
-            pred = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float32)
+            dist = np.full((len(self.vertices), len(self.vertices)), np.inf, dtype=np.float128)
             for i in range(self.n):
                 dist[i][i] = 0
-
+           
             for i in range(self.n):
                 for j in range(self.vertices[i].fromV.size):
                     w = self.vertices[i].fromV[j]
                     dist[i][w-1] = self.vertices[i].weights[j]
-
-            print(dist)
 
             for k in range(self.n):
                 for i in range(self.n):
                     for j in range(self.n):
                         if dist[i][j] > dist[i][k] + dist[k][j]:
                             dist[i][j] = dist[i][k] + dist[k][j]
-            print(dist)
+                print(k)
+                print(dist)
 
             for k in range(self.n):
+                print(k)
                 for i in range(self.n):
                     for j in range(self.n):
                         if dist[i][j] > dist[i][k] + dist[k][j]:
                             raiseExceptions("Graph has a negative-weight cycle, shortest paths are undefined.")
 
-            # with open('floydWarshallDirected.txt', 'w') as f:
-            #     f.write('Resultado de Floyd-Warshall feito no vértice {}:\n'.format(s))
-            #     f.write('Vertice | Distance | Path\n')
-            #     for v in self.vertices:
-            #         f.write('{} | {} | {}\n'.format(v.id, dist[s-1][v.id-1], path[v.id-1]))
+            with open('fdDirected.txt', 'w') as f:
+                f.write('Resultado de Floyd-Warshall entre os vértice {} e {}:\n'.format(s, d))
+                f.write('Distância: {}\n'.format(dist[s-1][d-1]))
+
         else:
             raise Exception('This graph was not initialized')
 
@@ -226,8 +224,8 @@ class Vertice:
 #### Testing ####
 
 mygraph = Digraph()
-mygraph.create_from_file('test.txt', kind='list')
+mygraph.create_from_file('estudos_tp2/grafo_W_4_0.txt', kind='list')
 
-mygraph.prim(1)
+mygraph.floydWarshall(1,10)
 
 #### TAIL ####
