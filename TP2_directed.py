@@ -177,41 +177,6 @@ class Digraph:
         else:
             raise Exception('This graph was not initialized')
 
-    def prim(self, s):
-        if self.weighted == 0:
-            raise Exception('Prim is not to be used in graphs without weights')
-        if self.kind == 'list':
-            cost = np.full(self.n, np.inf, dtype=np.float32)
-            V = np.arange(self.n, dtype=np.uint32)
-            S = np.array([], dtype=np.uint32)
-            cost[s-1] = 0
-
-            parents = np.full(self.n, -1)
-            levels = np.full(self.n, -1)
-            levels[s-1] = 0
-            
-            while np.array_equal(V, np.sort(S)) != True:
-                diff = np.setdiff1d(V, S, assume_unique=True)
-                cost_min = cost[diff].min()
-                if cost_min == np.inf:
-                    break
-                idx = np.where(cost==cost_min)
-                u = np.intersect1d(idx[0], diff)[0]
-                S = np.append(S, u)
-                for i in range(self.vertices[u].fromV.size):
-                    w = self.vertices[u].fromV[i]
-                    if w-1 not in S:
-                        if cost[w-1] > self.vertices[u].weights[i]:
-                            cost[w-1] = self.vertices[u].weights[i]
-                            parents[w-1] = u+1
-                            levels[w-1] = levels[u]+1
-            
-            with open('primDirected.txt', 'w') as f:
-                for v in self.vertices:
-                    f.write('{} {}\n'.format(v.id, parents[v.id-1]))
-        else:
-            raise Exception('This graph was not initialized')
-
 class Vertice:
     def __init__(self, id):
         # Creates a vertice where id is the identifier, fromV contains the edges
